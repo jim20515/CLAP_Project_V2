@@ -1,0 +1,48 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/ic_launcher"
+    android:orientation="vertical" >
+
+    <Button
+        android:id="@+id/button_load"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="onClick"
+        android:text="Load DSL" />
+
+    <TextView
+        android:id="@+id/DSLContents"
+        android:layout_width="match_parent"
+        android:layout_height="162dp"
+        android:gravity="left"
+        android:lines="12"
+        android:maxLines="12"
+        android:text="DSL contents"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="#FF0000" >
+    </TextView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/button_start"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.14"
+            android:onClick="onClick"
+            android:text="Start" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/button_end"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="onClick"
+        android:text="End" />
+
+</LinearLayout>

@@ -1,0 +1,19 @@
+<resources>
+
+    <string name="app_name">CLAP project</string>
+    <string name="menu_settings">Settings</string>
+    <string name="title_activity_main">PLPA_CLAP</string>
+    <string name="text1">貴用戶同意遵守所有與下載、安裝及使用軟體相關的當地法律和規定。貴用戶同意提供相關感測器數值供本站運用。</string>
+    <string name="cert">確定</string>
+    <string name="i_agree">我同意</string>
+    <string name="ok">你已接受同意!!</string>
+    <string name="str_alert_title">本實驗將擷取：</string>
+    <string name="str_ok">確認</string>
+    <string name="str_no">取消</string>
+    <string name="Bacc"/>
+    <string name="no">*請勾選我同意</string>
+    <string name="update">更新</string>
+    
+    <string name="loading">Loading</string>
+    <string name="wait">Please wait...</string>
+</resources>
