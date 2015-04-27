@@ -13,24 +13,38 @@ public abstract class ExpItemBase {
 	
 	public String mExpPrefix;
 	public ArrayList<ExpItemAttribute> mExpRealAttributes;
+	public ArrayList<String> mExpRealAttributesName;
+	public boolean needTimeLimit;
 	
 	public ExpItemBase(){
 		mExpRealAttributes = new ArrayList<ExpItemAttribute>();
-		
+		mExpRealAttributesName = new ArrayList<String>();
 	};
 	public IntentFilter getIntentFilter() {return null;}
+	public boolean onStart(Context context){return true;}
 	public void onDestroy(){}
 	public boolean receiveBroadcast(Context context, Intent intent) {return false;}
 	public void doSomethingBeforeUpload(Context context){};
 	
+	public void insertRecord(Context context, String attr, double value) {
+		insertRecord(context, attr, String.valueOf(value), null);
+	}
+	
 	public void insertRecord(Context context, String attr, String value) {
+		insertRecord(context, attr, value, null);
+	}
+	
+	public void insertRecord(Context context, String attr, double value, String dateTime) {
+		insertRecord(context, attr, String.valueOf(value), dateTime);
+	}
+	
+	public void insertRecord(Context context, String attr, String value, String dateTime) {
 		DbConstants dbItem = new DbConstants();
 		
 		dbItem.setItem(mExpPrefix.replace(".", ""));
 		dbItem.setAttr(attr);
 		dbItem.setAttrval(value);
-//		dbItem.setExId(exId);
-//		dbItem.setDeviceId(deviceId);
+		if(dateTime != null) dbItem.setDateTime(dateTime);
 		
 		DBHelper helper = new DBHelper(context);
 		helper.addRecord(dbItem);

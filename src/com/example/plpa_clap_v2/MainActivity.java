@@ -1,7 +1,6 @@
 package com.example.plpa_clap_v2;
 
 import java.io.File;
-import java.util.ArrayList;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -12,37 +11,31 @@ import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.Preference;
 import android.text.format.Time;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
 
-import com.example.pipa.item.ExpItemAttribute;
-import com.example.pipa.item.ExpUrlToken;
 import com.example.plpa.utils.CommonAlertDialog;
 import com.example.plpa.utils.Connectivity;
+import com.example.plpa.utils.ExpUrlToken;
 import com.example.plpa.utils.PreferenceHelper;
 import com.example.plpa.utils.ReadREST;
 import com.example.plpa.utils.ReadREST.AsyncResponse;
 import com.example.plpa.utils.SettingString;
 
-public class MainActivity extends Activity implements AsyncResponse{
+public class MainActivity extends Activity implements AsyncResponse {
 
-	public static final boolean mIsDebug = true;
-
+	private final boolean mIsDebug = SettingString.mIsDebug;
 	private Button mBtnLoadDSL;
 	private Button mBtnStart;
 	private Button mBtnEnd;
-	private TextView mDSLTxtView;
+	// private TextView mDSLTxtView;
 	private Context mContext = this;
 
 	private ExpUrlToken mExpChoice;
@@ -51,16 +44,7 @@ public class MainActivity extends Activity implements AsyncResponse{
 	private String mAuthCode;
 	private String mDeviceOs;
 	private String mDevice;
-	private String mTestDescript = "";
 	private String mExid = "";
-
-	// private ExpItemBase[] mExpAllItems;
-	// private ArrayList<ExpItemBase> mExpImplimentItems;
-	//
-	// private void initExpItem() {
-	// mExpAllItems = new ExpItemBase[] { new PhoneCallInfo() };
-	// mExpImplimentItems = new ArrayList<ExpItemBase>();
-	// }
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -117,7 +101,7 @@ public class MainActivity extends Activity implements AsyncResponse{
 		mBtnLoadDSL = (Button) findViewById(R.id.button_load);
 		mBtnStart = (Button) findViewById(R.id.button_start);
 		mBtnEnd = (Button) findViewById(R.id.button_end);
-		mDSLTxtView = (TextView) findViewById(R.id.DSLContents);
+		// mDSLTxtView = (TextView) findViewById(R.id.DSLContents);
 
 		updateUI(isMyServiceRunning(LogService.class));
 	}
@@ -144,13 +128,14 @@ public class MainActivity extends Activity implements AsyncResponse{
 		File f = new File(PreferenceHelper.XML_PATH);
 		if (f.exists()) {
 			Log.v(SettingString.TAG, "SharedPreferences checkid : exist");
-			mClicentDeviceID = PreferenceHelper.getString(this, 
+			mClicentDeviceID = PreferenceHelper.getString(this,
 					PreferenceHelper.CLIENT_DEVICE_ID);
-			mAuthCode = PreferenceHelper.getString(this, 
+			mAuthCode = PreferenceHelper.getString(this,
 					PreferenceHelper.AUTH_CODE);
-			
+
 		} else {
-			Log.v(SettingString.TAG, "New checkId url:" + ReadREST.WEBSERVICE_ID_URI);
+			Log.v(SettingString.TAG, "New checkId url:"
+					+ ReadREST.WEBSERVICE_ID_URI);
 			ReadREST readREST = new ReadREST();
 			readREST.execute(ReadREST.WEBSERVICE_ID_URI); // 受測者ID和授權碼RESTFUL
 			readREST.mAsyncDelegate = this;
@@ -172,32 +157,15 @@ public class MainActivity extends Activity implements AsyncResponse{
 			loadDSL(); // 取得實驗列表
 			break;
 		case R.id.button_start:
-			// startRecording(); // 重新恢復復錄
-			updateUI(true);
+			startRecording(); // 重新恢復復錄
+
 			break;
 		case R.id.button_end:
 			StopService(); // 停止記錄
-			updateUI(false);
+
 			break;
 		default:
 			break;
-		}
-	}
-
-	// 停止後端記錄，後端LogService轉換至PLPA_CLAP
-	private void StopService() {
-		// mChecktest = false;
-		//
-		// SharedPreferences settings = getSharedPreferences(
-		// SettingString.PREF_FILENAME, Context.MODE_PRIVATE);
-		// SharedPreferences.Editor editor = settings.edit();
-		// editor.putBoolean(SettingString.CHECK_TEXT, mChecktest);
-
-		try {
-			// Intent i = new Intent(this, LogService.class);
-			// stopService(i);
-		} catch (Exception e) {
-			Log.e(SettingString.TAG, "Stop Service Error", e);
 		}
 	}
 
@@ -205,7 +173,7 @@ public class MainActivity extends Activity implements AsyncResponse{
 	private void loadDSL() {
 		if (Connectivity.isConnected(this)) { // 偵測有無網路狀態
 			loadExperimentList();
-			
+
 		} else { // 偵測沒有網路，提醒開啟網路功能
 			CommonAlertDialog.showOKAlertDialog(this, "為方便實驗，請開啟無線網路功能");
 		}
@@ -247,64 +215,14 @@ public class MainActivity extends Activity implements AsyncResponse{
 
 				mExpChoice = expList[which];
 				mExid = mExpChoice.mId;
-				
-				String descriptionString = "";
+
 				final String expScript = mExpChoice.mScript;
 				if (mIsDebug)
 					Log.d(SettingString.TAG, expScript);
 
-				System.out.println("clicking DSL number = " + which);
+				String descriptionString = ExpUrlToken
+						.getExpDescription(expScript);
 
-				String[] temps2 = expScript
-						.split(ExpUrlToken.TOKEN_UPLOAD_POLICY);
-				String[] temps1 = temps2[0].split(ExpUrlToken.TOKEN_WHERE);
-
-				String itemString = ((temps1.length > 0 ? temps1[0] : "")
-						.replace("log ", "")).trim();
-				String whereConditionString = (temps1.length > 1 ? temps1[1]
-						: "").trim();
-				String uploadPolicyString = (temps2.length > 1 ? temps2[1] : "")
-						.trim();
-
-				ArrayList<ExpItemAttribute> attris = new ArrayList<ExpItemAttribute>();
-
-				for (String item : itemString.split(",")) {
-					String[] token = item.trim().split(" ");
-					if (token.length == 2) {
-						ExpItemAttribute itemAttr = new ExpItemAttribute();
-						itemAttr.mName = token[0];
-						descriptionString += itemAttr.mName + " ";
-						try {
-							itemAttr.mNumber = Integer.valueOf(token[1]);
-
-						} catch (Exception e) {
-
-							// don't need interval
-							itemAttr.mNumber = -1;
-						}
-
-						attris.add(itemAttr);
-					}
-
-				}
-
-				for (String where : whereConditionString.split(",")) {
-					String[] token = where.split(" ");
-					if (token.length == 3) {
-						for (ExpItemAttribute name : attris) {
-							if (name.mName.equals(token[0])) {
-								name.mWhereExpress = token[1];
-								name.mWhereValue = token[2];
-							}
-						}
-					}
-				}
-
-				final String[] uploadLimit = uploadPolicyString.split(",");
-				final ArrayList<ExpItemAttribute> finalItemAttrs = (ArrayList<ExpItemAttribute>) attris
-						.clone();
-				// String normalText = mContents; // 提醒使用者此實驗記錄屬性
-				// Log.v(TAG,contents);
 				String strDialogTitle = getString(R.string.str_alert_title);
 
 				CommonAlertDialog.showAlertDialog(mContext, strDialogTitle,
@@ -313,67 +231,79 @@ public class MainActivity extends Activity implements AsyncResponse{
 							public void onClick(DialogInterface dialog,
 									int whichButton) // 確認後開始感測
 							{
-								startRecording(finalItemAttrs, uploadLimit);
-								updateUI(true);
+								PreferenceHelper
+										.setPreference(mContext,
+												PreferenceHelper.PREF_SCRIPT,
+												expScript);
+								PreferenceHelper.setPreference(mContext,
+										PreferenceHelper.ID_CHECK, mExid);
+
+								Time time = new Time();
+								time.setToNow();
+
+								PreferenceHelper.setPreference(mContext,
+										PreferenceHelper.UPLOADED_TIME,
+										time.toMillis(false));
+
+								startRecording();
 								dialog.dismiss();
 
-								PreferenceHelper.setPreference(mContext, 
-										PreferenceHelper.PREF_SCRIPT, expScript);
-								PreferenceHelper.setPreference(mContext, 
-										PreferenceHelper.ID_CHECK, mExid);
-								
-								Time time = new Time();   
-								time.setToNow();
-								
-								PreferenceHelper.setPreference(mContext, 
-										PreferenceHelper.UPLOADED_TIME, time.toMillis(false));
-								
 							}
 
 						});
 
-				// String DSLString = mContents.replace(",", "").replace(" ",
-				// "");
-
 			}
-		})
-				.setNegativeButton(R.string.str_no,
-						new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog,
-									int whichButton) {
+		});
 
-								updateUI(false);
-								dialog.dismiss();
-							}
-						}).show();
+		builder.setNegativeButton(R.string.str_no,
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+
+						updateUI(false);
+						dialog.dismiss();
+					}
+				});
+
+		builder.show();
 	}
 
-	private void startRecording(ArrayList<ExpItemAttribute> items,
-			String[] uploadLimit) {
+	private void startRecording() {
+
+		updateUI(true);
 
 		Log.v(SettingString.TAG, "Start Recording");
 		Intent intent = new Intent();
-
-		intent.putExtra(SettingString.INTENTKEY_EXP_ITEMS, items);
-		intent.putExtra(SettingString.INTENTKEY_EXP_UPLOADTIME, uploadLimit);
-
 		intent.setClass(this, LogService.class); // 轉換至後端LogService
 		startService(intent);// 好像沒有Start service
 		finish();
 
 	}
 
+	// 停止後端記錄，後端LogService轉換至PLPA_CLAP
+	private void StopService() {
+		try {
+			updateUI(false);
+
+			Intent i = new Intent(this, LogService.class);
+			stopService(i);
+		} catch (Exception e) {
+			Log.e(SettingString.TAG, "Stop Service Error", e);
+		}
+	}
+
 	private boolean isMyServiceRunning(Class<?> serviceClass) {
 		ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
 		for (RunningServiceInfo service : manager
 				.getRunningServices(Integer.MAX_VALUE)) {
-			String servicename = serviceClass.getName();
-			String serviceString = service.service.getClassName();
 
 			if (serviceClass.getName().equals(service.service.getClassName())) {
+				Log.d(SettingString.TAG, "service is still running:"
+						+ serviceClass.getName());
 				return true;
 			}
 		}
+
+		Log.d(SettingString.TAG, "service is not running");
 		return false;
 	}
 
@@ -400,12 +330,13 @@ public class MainActivity extends Activity implements AsyncResponse{
 						// ClicentDeviceID = "262";
 						// AuthCode = "52bceea3e55a6e2fdee85b30efc8fa71";
 
-						Log.v(SettingString.TAG, "ClicentDeviceID" + mClicentDeviceID
-								+ "AuthCode" + mAuthCode);
-						PreferenceHelper.setPreference(this, PreferenceHelper.CLIENT_DEVICE_ID, 
+						Log.v(SettingString.TAG, "ClicentDeviceID"
+								+ mClicentDeviceID + "AuthCode" + mAuthCode);
+						PreferenceHelper.setPreference(this,
+								PreferenceHelper.CLIENT_DEVICE_ID,
 								mClicentDeviceID);
-						PreferenceHelper.setPreference(this, PreferenceHelper.AUTH_CODE, 
-								mAuthCode);
+						PreferenceHelper.setPreference(this,
+								PreferenceHelper.AUTH_CODE, mAuthCode);
 
 					} else if (String.format(ReadREST.WEBSERVICE_EXPLIST_URL,
 							mDeviceOs, mDevice, mClicentDeviceID, mAuthCode)
@@ -443,31 +374,5 @@ public class MainActivity extends Activity implements AsyncResponse{
 		}
 
 	}
-	
-	public class BatteryReceiver extends BroadcastReceiver {
 
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			// TODO Auto-generated method stub
-
-			String actionString = intent.getAction();
-
-			if (mIsDebug)
-				Log.d(SettingString.TAG, "onReceive, Get Action:"
-						+ actionString);
-
-			if (Intent.ACTION_BATTERY_LOW.equals(actionString)) {
-				//stop service
-				
-			} else if (Intent.ACTION_BATTERY_OKAY.equals(actionString) ||
-					Intent.ACTION_BOOT_COMPLETED.equals(actionString)) {
-				//start service
-				
-			} 
-			
-		}
-
-	}
-	
-	
 }

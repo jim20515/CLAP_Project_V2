@@ -38,7 +38,7 @@ public class DBHelper extends SQLiteOpenHelper {
 		final String INIT_TABLE = "CREATE TABLE " + TABLE_NAME + " (" + _ID
 				+ " INTEGER PRIMARY KEY AUTOINCREMENT, "
 				+ ITEM + " TEXT, " + ATTR + " TEXT, " + ATTRVAL + " TEXT, "
-				+ DATETIME + " CURRENT_TIME);";
+				+ DATETIME + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP);";
 		db.execSQL(INIT_TABLE);
 
 		Log.v(mTag, INIT_TABLE);
@@ -73,14 +73,10 @@ public class DBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         // Define values for each field
         ContentValues values = new ContentValues();
-//        values.put(UUID, record.getUuid());
         values.put(ITEM, record.getItem()); 
         values.put(ATTR, record.getAttr());
         values.put(ATTRVAL, record.getAttrval());
-        values.put(DATETIME, record.getDateTime());
-//        values.put(EXID, record.getExId());
-//        values.put(DEVICEID, record.getExId());
-        // Insert Row
+        if(record.getDateTime() != null) values.put(DATETIME, record.getDateTime());
         db.insertOrThrow(TABLE_NAME, null, values);
         db.close(); // Closing database connection
     }

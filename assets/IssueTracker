@@ -1,0 +1,5 @@
+2.uploadExpRecord沒有網路時 彈完視窗後還是一樣沒有作用（應該不要彈視窗，不然使用者應該會煩死）
+3.開機、power ok、 power off要開、關Service 
+4.上傳的時候沒有把全部的字串上傳上去
+
+now 要使用TimeLimit跟recordloadlimit

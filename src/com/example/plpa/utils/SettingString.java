@@ -3,6 +3,7 @@ package com.example.plpa.utils;
 public class SettingString {
 
 	public static final String TAG = "Jim";
+	public static final boolean mIsDebug = true;
 	
 //	public static final String CHECK_TEXT = "checktest"; // 已分析實驗設定參數XML檔名
 //	public static final String PREF_CALL = "clapcall"; // 通話記錄初始值XML檔名

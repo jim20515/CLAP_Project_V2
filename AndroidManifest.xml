@@ -48,15 +48,15 @@
             </intent-filter>
         </activity>
         
-        <receiver android:name=".MainActivity">
+        <service android:name=".LogService"/>
+                
+        <receiver android:name=".LogService">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.BATTERY_LOW" />
                 <action android:name="android.intent.action.BATTERY_OKAY" />
             </intent-filter>
         </receiver>
-        
-        <service android:name=".LogService"/>
     </application>
 
 </manifest>

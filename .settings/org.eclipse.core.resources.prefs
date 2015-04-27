@@ -2,3 +2,5 @@ eclipse.preferences.version=1
 encoding//src/com/example/pipa/item/AccItem.java=UTF-8
 encoding//src/com/example/pipa/item/CalActItem.java=UTF-8
 encoding//src/com/example/pipa/item/CallItem.java=UTF-8
+encoding//src/com/example/pipa/item/GpsItem.java=UTF-8
+encoding//src/com/example/pipa/item/WifiItem.java=UTF-8

@@ -1,9 +1,7 @@
 package com.example.pipa.item;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import android.annotation.SuppressLint;
 import android.app.Service;
@@ -24,12 +22,23 @@ public class CalActItem extends ExpItemBase {
 	private final String RECEIVE_NUMBER = "receivenumber";
 	private final String RECEIVE_TIME = "receivetime";
 
-	public final String ALERT_STRING = "電話資訊";
+	private final String PREF_CALL_NUMBER;
+	private final String PREF_CALL_TIME;
+	private final String PREF_RECEIVE_NUMBER;
+	private final String PREF_RECEIVE_TIME;
+	
+	public final String ALERT_STRING = "通話資訊";
 
 	public CalActItem(Service service) {
 		// TODO Auto-generated constructor stub
 
-		mExpPrefix = "calact.";
+		mExpPrefix = "callact.";
+		needTimeLimit = false;
+		
+		PREF_CALL_NUMBER = mExpPrefix + CALL_NUMBER;
+		PREF_CALL_TIME = mExpPrefix + CALL_TIME;
+		PREF_RECEIVE_NUMBER = mExpPrefix + RECEIVE_NUMBER;
+		PREF_RECEIVE_TIME = mExpPrefix + RECEIVE_TIME;
 	}
 
 	@SuppressLint("SimpleDateFormat")
@@ -41,11 +50,6 @@ public class CalActItem extends ExpItemBase {
 		if(mExpRealAttributes.size() == 0)
 			return;
 		
-		List<String> realAttributesName = new ArrayList<String>();
-		for (ExpItemAttribute attr : mExpRealAttributes) {
-			realAttributesName.add(attr.mName);
-		}
-		
 		long uploadTime = PreferenceHelper.getLong(context, PreferenceHelper.UPLOADED_TIME);
 		
 		ContentResolver resolver = context.getContentResolver();
@@ -56,7 +60,7 @@ public class CalActItem extends ExpItemBase {
 				CallLog.Calls.DEFAULT_SORT_ORDER);
 
 		SimpleDateFormat formatter = new SimpleDateFormat(
-				"yy-MM-dd HH:mm:ss");
+				"yyyy-MM-dd HH:mm:ss");
 		
 		int callTime = 0;
 		int receiveTime = 0;
@@ -81,26 +85,26 @@ public class CalActItem extends ExpItemBase {
 				Log.d("Jim", "Name:" + name + "Incoming:" + number + ", Time:"
 						+ time);
 				
-				if(realAttributesName.contains(RECEIVE_NUMBER))
+				if(mExpRealAttributesName.contains(PREF_RECEIVE_NUMBER))
 					insertRecord(context, RECEIVE_NUMBER, 
-						cursor.getString(cursor.getColumnIndex(CallLog.Calls.NUMBER)));
+						cursor.getString(cursor.getColumnIndex(CallLog.Calls.NUMBER)), time);
 				
 				receiveTime += duration;
-				if(realAttributesName.contains(RECEIVE_TIME))
-					insertRecord(context, RECEIVE_TIME, String.valueOf(receiveTime));
+				if(mExpRealAttributesName.contains(PREF_RECEIVE_TIME))
+					insertRecord(context, RECEIVE_TIME, String.valueOf(receiveTime), time);
 				
 			//out call
 			} else if (cursor.getInt(cursor.getColumnIndex(CallLog.Calls.TYPE)) == 2) {
 				Log.d("Jim", "Name:" + name + "Outcoming:" + number + ", Time:"
 						+ time);
 
-				if(realAttributesName.contains(CALL_NUMBER))
+				if(mExpRealAttributesName.contains(PREF_CALL_NUMBER))
 					insertRecord(context, CALL_NUMBER, 
-						cursor.getString(cursor.getColumnIndex(CallLog.Calls.NUMBER)));
+						cursor.getString(cursor.getColumnIndex(CallLog.Calls.NUMBER)), time);
 				
 				callTime += duration;
-				if(realAttributesName.contains(CALL_TIME))
-					insertRecord(context, CALL_TIME, String.valueOf(callTime));
+				if(mExpRealAttributesName.contains(PREF_CALL_TIME))
+					insertRecord(context, CALL_TIME, String.valueOf(callTime), time);
 			}
 		}
 	}

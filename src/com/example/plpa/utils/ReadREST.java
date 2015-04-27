@@ -4,11 +4,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import com.example.plpa_clap_v2.MainActivity;
-
 import android.os.AsyncTask;
-import android.text.style.URLSpan;
-import android.util.Log;
 
 public class ReadREST extends AsyncTask<String, Void, String> {
 

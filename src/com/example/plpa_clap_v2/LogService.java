@@ -8,21 +8,22 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.hardware.Sensor;
-import android.hardware.SensorManager;
-import android.location.LocationManager;
 import android.os.IBinder;
 import android.util.Base64;
 import android.util.Log;
+import android.widget.Toast;
 
+import com.example.pipa.item.AccItem;
+import com.example.pipa.item.CalActItem;
 import com.example.pipa.item.CallItem;
 import com.example.pipa.item.ExpItemAttribute;
 import com.example.pipa.item.ExpItemBase;
-import com.example.plpa.utils.CommonAlertDialog;
-import com.example.plpa.utils.Connectivity;
+import com.example.pipa.item.GpsItem;
+import com.example.pipa.item.WifiItem;
 import com.example.plpa.utils.DBHelper;
 import com.example.plpa.utils.DbConstants;
 import com.example.plpa.utils.ExpJson;
+import com.example.plpa.utils.ExpUrlToken;
 import com.example.plpa.utils.PreferenceHelper;
 import com.example.plpa.utils.SettingString;
 import com.rabbitmq.client.Channel;
@@ -32,7 +33,7 @@ import com.rabbitmq.client.ConnectionFactory;
 public class LogService extends Service {
 
 	private final String mTag = SettingString.TAG;
-	private final boolean mIsDebug = MainActivity.mIsDebug;
+	public static final boolean mIsDebug = SettingString.mIsDebug;
 
 	private final String SCREENOFFUPLOAD = "screenoffupload";
 	private final String CHARGINGUPLOAD = "chargingupload";
@@ -40,11 +41,11 @@ public class LogService extends Service {
 	private final String RECORDLIMIT = "recordlimit";
 	public static final String KEY_UPLOAD_DATE = "key_upload_date";
 	
-	private static String AMQPHOST = "140.119.221.34";
-	private static String AMQPVHOST = "clap";
-	private static String AMQPUSER = "clap";
-	private static String AMQPPASSWORD = "clap@nccu";
-	private static String QUEUE_NAME = "clap";
+	private static final String AMQPHOST = "140.119.221.34";
+	private static final String AMQPVHOST = "clap";
+	private static final String AMQPUSER = "clap";
+	private static final String AMQPPASSWORD = "clap@nccu";
+	private static final String QUEUE_NAME = "clap";
 
 	private int mTimeLimit = 10000;// default
 	private int mRecordLimit = 10000;// default
@@ -56,7 +57,14 @@ public class LogService extends Service {
 	private static DBHelper mDbHelper = null;
 
 	private void initService() {
-		mAllExpItems = new ExpItemBase[] { new CallItem(this) };
+		mAllExpItems = new ExpItemBase[] { 
+				new CallItem(this), 
+				new CalActItem(this), 
+				new AccItem(this),
+				new GpsItem(this),
+				new WifiItem(this)
+				};
+		
 		mDbHelper = new DBHelper(this);
 	}
 
@@ -90,55 +98,19 @@ public class LogService extends Service {
 		Log.d(mTag, "Start Service");
 		initService();
 
-		ArrayList<ExpItemAttribute> items = (ArrayList<ExpItemAttribute>) intent
-				.getSerializableExtra(SettingString.INTENTKEY_EXP_ITEMS);
-		mRealExpItems = determineExpItem(items);
+		String expScript = PreferenceHelper.getString(this, PreferenceHelper.PREF_SCRIPT);
+		ArrayList<ExpItemAttribute> attris = ExpUrlToken.getExpAttribute(expScript);
+		
+		mRealExpItems = determineExpItem(attris);
 
-		String[] uploadTimes = intent
-				.getStringArrayExtra(SettingString.INTENTKEY_EXP_UPLOADTIME);
+		String[] uploadTimes = ExpUrlToken.getUploadPolicy(expScript);
 		determineUploadTime(uploadTimes);
 
 		for (ExpItemBase item : mRealExpItems) {
 			registerBroadcastReciever(item.getIntentFilter());
+			if(!item.onStart(this))
+				stopSelf();
 		}
-		
-		// IntentFilter filter = new
-		// IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-		// getApplication().getApplicationContext().registerReceiver(EReceiver,
-		// filter); // 電量初始畫
-		//
-		// Log.v(TAG, "Log onStart");
-		//
-		// SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
-		// java.util.Date today = new Date();
-		// todayTime = String.valueOf(sdf.format(today));
-		// Log.v("TAG", "todayTime" + todayTime);
-		//
-		// sqlCase = "select * from clap ";
-		// // registerScreenBroadcastReceiver();
-		//
-		// getPref(); // 取得頗析後的參數
-		// if (screenupload) {
-		// registerScreenBroadcastReceiver(); // 螢幕關閉待機時上傳事件註冊
-		// }
-		// if (chageupload) {
-		// registerPowerconnectBroadcastReceiver(); // 充電時上傳事件註冊
-		// }
-		// Log.v(TAG, "screenupload" + String.valueOf(screenupload));
-		// Log.v(TAG, "chageupload" + String.valueOf(chageupload));
-		//
-		// logdetermine();
-		// checkstart();
-		// /*
-		// * SharedPreferences settings = getSharedPreferences(PREF_FILENAME,0);
-		// * checktest = settings.getBoolean("checktest",checktest); if
-		// * (checktest){ openDatabase();
-		// *
-		// * Log.v("TAG","logdetermine startRecording"); startRecording();
-		// }else{
-		// *
-		// * }
-		// */
 
 	}
 
@@ -148,12 +120,18 @@ public class LogService extends Service {
 
 			for (String item : uploadTime) {
 				String trimItem = item.trim();
+
+				if(mIsDebug) Log.d(mTag, "Upload time:" + item);
 				
-				if (trimItem.equals(SCREENOFFUPLOAD))
+				if (trimItem.equals(SCREENOFFUPLOAD)) {
+
 					filter.addAction(Intent.ACTION_SCREEN_OFF);
-				else if (trimItem.equals(CHARGINGUPLOAD))
+					if(mIsDebug) Log.d(mTag, "Filter Add SCREEN OFF UPLOAD");
+				} else if (trimItem.equals(CHARGINGUPLOAD)) {
+					
 					filter.addAction(Intent.ACTION_POWER_CONNECTED);
-				else {
+					if(mIsDebug) Log.d(mTag, "Filter Add ACTION POWER CONNECTED");
+				} else {
 					String[] token = trimItem.split(" ");
 
 					if (token.length == 2) {
@@ -195,14 +173,20 @@ public class LogService extends Service {
 
 		for (ExpItemAttribute realAttr : attris) {
 			for (ExpItemBase item : mAllExpItems) {
+
 				if (realAttr.mName.contains(item.mExpPrefix)) {
-
-					if (!realItems.contains(item))
+					
+					if (!realItems.contains(item)) {
 						realItems.add(item);
-
-					realItems.get(realItems.indexOf(item)).mExpRealAttributes
-							.add(realAttr);
-
+					}
+					
+					Log.d(mTag, "Add exp item:" + item.mExpPrefix + " Attr:" + realAttr.mName);
+					
+					ExpItemBase realItem = realItems.get(realItems.indexOf(item));
+					realItem.mExpRealAttributes.add(realAttr);
+					//for individual item judge.
+					realItem.mExpRealAttributesName.add(realAttr.mName);
+					
 					break;
 				}
 			}
@@ -220,19 +204,28 @@ public class LogService extends Service {
 			String actionString = intent.getAction();
 
 			if (mIsDebug)
-				Log.d(mTag, "onReceive, Get Action:" + actionString);
+//				Log.d(mTag, "onReceive, Get Action:" + actionString);
+				Toast.makeText(context, actionString, Toast.LENGTH_LONG).show();
 
 			boolean isReceived = false;
 
-			if (Intent.ACTION_SCREEN_OFF.equals(actionString)) {
+			if (Intent.ACTION_SCREEN_OFF.equals(actionString) || 
+					Intent.ACTION_POWER_CONNECTED.equals(actionString)) {
 
-				uploadExpRecord();
+				for (ExpItemBase item : mRealExpItems) {
+					item.doSomethingBeforeUpload(context);
+				}
+				
+//				uploadExpRecord();
 				isReceived = true;
 
-			} else if (Intent.ACTION_POWER_CONNECTED.equals(actionString)) {
-
-				isReceived = true;
-
+			} else if (Intent.ACTION_BATTERY_LOW.equals(actionString)) {
+				//stop service
+				
+			} else if (Intent.ACTION_BATTERY_OKAY.equals(actionString) ||
+					Intent.ACTION_BOOT_COMPLETED.equals(actionString)) {
+				//start service
+				
 			} else {
 				for (ExpItemBase item : mRealExpItems) {
 					if (item.receiveBroadcast(context, intent)) {
@@ -252,10 +245,10 @@ public class LogService extends Service {
 
 	public void uploadExpRecord() {
 		
-		if(!Connectivity.isConnected(this)) {
-			CommonAlertDialog.showOKAlertDialog(this, "請開啟Wifi以供資料上傳");
-			return;
-		}
+//		if(!Connectivity.isConnected(this)) {
+//			CommonAlertDialog.showOKAlertDialog(this, "請開啟Wifi以供資料上傳");
+//			return;
+//		}
 		
 		for (ExpItemBase item : mRealExpItems) {
 			item.doSomethingBeforeUpload(this);
@@ -292,7 +285,7 @@ public class LogService extends Service {
 					System.currentTimeMillis());
 			
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
+			Log.d(mTag, e.getMessage());
 		}
 
 	}
