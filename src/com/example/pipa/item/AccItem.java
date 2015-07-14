@@ -2,6 +2,7 @@ package com.example.pipa.item;
 
 import android.app.Service;
 import android.content.Context;
+import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -14,30 +15,30 @@ public class AccItem extends ExpItemBase implements SensorEventListener {
 
 	private final String mTag = SettingString.TAG;
 
-	private Service mService;
 	private SensorManager mSensorManager;
     private Sensor mAccelerometer;
+    
+    float newX;
+	float newY;
+	float newZ;
 	
 	private final String ACCELEROMETER_X = "ax";
 	private final String ACCELEROMETER_Y = "ay";
 	private final String ACCELEROMETER_Z = "az";
 	
-	private final String PREF_ACCELEROMETER_X;
-	private final String PREF_ACCELEROMETER_Y;
-	private final String PREF_ACCELEROMETER_Z;
+//	private final String PREF_ACCELEROMETER_X = ACCELEROMETER_X;
+//	private final String PREF_ACCELEROMETER_Y = ACCELEROMETER_Y;
+//	private final String PREF_ACCELEROMETER_Z = ACCELEROMETER_Z;
 
 	public final String ALERT_STRING = "加速度感測器";
 
 	public AccItem(Service service) {
 		// TODO Auto-generated constructor stub
 
-		mExpPrefix = "acc.";
+		super(service);
+		mExpPrefix = "Acc";
 		mService = service;
-		needTimeLimit = true;
 		
-		PREF_ACCELEROMETER_X = mExpPrefix + ACCELEROMETER_X;
-		PREF_ACCELEROMETER_Y = mExpPrefix + ACCELEROMETER_Y;
-		PREF_ACCELEROMETER_Z = mExpPrefix + ACCELEROMETER_Z;
 	}
 
 	@Override
@@ -52,11 +53,10 @@ public class AccItem extends ExpItemBase implements SensorEventListener {
 		// TODO Auto-generated method stub
 		if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
 
-			float newX = event.values[SensorManager.DATA_X];
-			float newY = event.values[SensorManager.DATA_Y];
-			float newZ = event.values[SensorManager.DATA_Z];
+			newX = event.values[SensorManager.DATA_X];
+			newY = event.values[SensorManager.DATA_Y];
+			newZ = event.values[SensorManager.DATA_Z];
 			
-			if(SettingString.mIsDebug) Log.d(mTag, "x:" + newX + " y:" + newY + " z:" + newZ);
 		}
 	}
 
@@ -76,8 +76,28 @@ public class AccItem extends ExpItemBase implements SensorEventListener {
 		// TODO Auto-generated method stub
 		mSensorManager.unregisterListener(this);
 		
+		am.cancel(pi);
+		mService.unregisterReceiver(br);
+		
 		super.onDestroy();
 	}
 
+	@Override
+	public boolean needTimeLimit() {
+		// TODO Auto-generated method stub
+		return true;
+	}
 	
+	@Override
+	public void receiveIntervalEvent(Context c, Intent i) {
+		// TODO Auto-generated method stub
+		
+		if(SettingString.mIsDebug) Log.d(mTag, "x:" + newX + " y:" + newY + " z:" + newZ);
+		insertRecord(c, ACCELEROMETER_X, newX);
+		insertRecord(c, ACCELEROMETER_Y, newY);
+		insertRecord(c, ACCELEROMETER_Z, newZ);
+		
+		super.receiveIntervalEvent(c, i);
+	}
+
 }

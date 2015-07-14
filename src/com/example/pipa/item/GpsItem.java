@@ -29,27 +29,27 @@ public class GpsItem extends ExpItemBase implements LocationListener {
 	private final String BEARING = "bearing";
 	private final String ALTITUDE = "altitude";
 	
-	private final String PREF_LONGITUDE;
-	private final String PREF_LATITUDE;
-	private final String PREF_ACCURACY;
-	private final String PREF_SPEED;
-	private final String PREF_BEARING;
-	private final String PREF_ALTITUDE;
+	private final String PREF_LONGITUDE = LONGITUDE;
+	private final String PREF_LATITUDE = LATITUDE;
+	private final String PREF_ACCURACY = ACCURACY;
+	private final String PREF_SPEED = SPEED;
+	private final String PREF_BEARING = BEARING;
+	private final String PREF_ALTITUDE = ALTITUDE;
 
 	public final String ALERT_STRING = "GPS資訊";
 
 	public GpsItem(Service service) {
 		// TODO Auto-generated constructor stub
 
-		mExpPrefix = "gps.";
-		needTimeLimit = false;
+		super(service);
+		mExpPrefix = "Gps";
 		
-		PREF_LONGITUDE = mExpPrefix + LONGITUDE;
-		PREF_LATITUDE = mExpPrefix + LATITUDE;
-		PREF_ACCURACY = mExpPrefix + ACCURACY;
-		PREF_SPEED = mExpPrefix + SPEED;
-		PREF_BEARING = mExpPrefix + BEARING;
-		PREF_ALTITUDE = mExpPrefix + ALTITUDE;
+//		PREF_LONGITUDE = mExpPrefix + LONGITUDE;
+//		PREF_LATITUDE = mExpPrefix + LATITUDE;
+//		PREF_ACCURACY = mExpPrefix + ACCURACY;
+//		PREF_SPEED = mExpPrefix + SPEED;
+//		PREF_BEARING = mExpPrefix + BEARING;
+//		PREF_ALTITUDE = mExpPrefix + ALTITUDE;
 	}
 
 	@Override
@@ -95,22 +95,22 @@ public class GpsItem extends ExpItemBase implements LocationListener {
 		//當地點改變時
 		// TODO Auto-generated method stub
 
-		if(mExpRealAttributesName.contains(PREF_LONGITUDE))
+		if(mExpRealAttributes.contains(PREF_LONGITUDE))
 			insertRecord(mContext, LONGITUDE, arg0.getLongitude());
 		
-		if(mExpRealAttributesName.contains(PREF_LATITUDE))
+		if(mExpRealAttributes.contains(PREF_LATITUDE))
 			insertRecord(mContext, LATITUDE, arg0.getLatitude());
 		
-		if(mExpRealAttributesName.contains(PREF_ACCURACY))
+		if(mExpRealAttributes.contains(PREF_ACCURACY))
 			insertRecord(mContext, ACCURACY, arg0.getAccuracy());
 		
-		if(mExpRealAttributesName.contains(PREF_SPEED))
+		if(mExpRealAttributes.contains(PREF_SPEED))
 			insertRecord(mContext, SPEED, arg0.getSpeed());
 		
-		if(mExpRealAttributesName.contains(PREF_BEARING))
+		if(mExpRealAttributes.contains(PREF_BEARING))
 			insertRecord(mContext, BEARING, arg0.getBearing());
 		
-		if(mExpRealAttributesName.contains(PREF_ALTITUDE))
+		if(mExpRealAttributes.contains(PREF_ALTITUDE))
 			insertRecord(mContext, ALTITUDE, arg0.getAltitude());
 		
 		if(SettingString.mIsDebug) Log.d(mTag, DateTimeHelper.getNowFormat() + " Location Lat:" + arg0.getLatitude() + " Long:" + arg0.getLongitude());
@@ -138,6 +138,12 @@ public class GpsItem extends ExpItemBase implements LocationListener {
 		//定位狀態改變
 		//status=OUT_OF_SERVICE 供應商停止服務
 		//status=TEMPORARILY_UNAVAILABLE 供應商暫停服務
+	}
+
+	@Override
+	public boolean needTimeLimit() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 	

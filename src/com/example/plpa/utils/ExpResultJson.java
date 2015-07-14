@@ -8,22 +8,22 @@ import org.json.JSONObject;
 
 import android.content.Context;
 
-public class ExpJson {
-	private String mClientDeviceId;
-	private String mExId;
+public class ExpResultJson {
+//	private String mClientDeviceId;
+//	private String mExId;
 	
 	private final String SENSOR_KEY = "sensor";
 	private final String TIME_KEY = "time";
-	private final String LOGS_KEY = "logs";
+//	private final String LOGS_KEY = "logs";
 	
-	private final String EXPERIMENT_ID_KEY = "experimentid";
-	private final String CLIENT_DEVICEDID_KEY = "clientdeviceid";
+//	private final String EXPERIMENT_ID_KEY = "experimentid";
+//	private final String CLIENT_DEVICEDID_KEY = "clientdeviceid";
 	
-	public ExpJson(){}
-	public ExpJson(Context context) {
+	public ExpResultJson(){}
+	public ExpResultJson(Context context) {
 		
-		mClientDeviceId = PreferenceHelper.getString(context, PreferenceHelper.CLIENT_DEVICE_ID);
-		mExId = PreferenceHelper.getString(context, PreferenceHelper.ID_CHECK);
+//		mClientDeviceId = PreferenceHelper.getString(context, PreferenceHelper.CLIENT_DEVICE_ID);
+//		mExId = PreferenceHelper.getString(context, PreferenceHelper.ID_CHECK);
 		
 	}
 	
@@ -32,9 +32,9 @@ public class ExpJson {
 		if(constants != null) {
 			
 			try {
-				JSONObject uploadJson = new JSONObject();
-				uploadJson.put(EXPERIMENT_ID_KEY, mExId);
-				uploadJson.put(CLIENT_DEVICEDID_KEY, mClientDeviceId);
+//				JSONObject uploadJson = new JSONObject();
+//				uploadJson.put(EXPERIMENT_ID_KEY, mExId);
+//				uploadJson.put(CLIENT_DEVICEDID_KEY, mClientDeviceId);
 
 				JSONArray logs = new JSONArray();
 				
@@ -49,9 +49,9 @@ public class ExpJson {
 					logs.put(record);
 				}
 				
-				uploadJson.put(LOGS_KEY, logs);
+//				uploadJson.put(LOGS_KEY, logs);
 				
-				return uploadJson.toString();
+				return logs.toString();
 				
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block

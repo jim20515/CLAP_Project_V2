@@ -23,23 +23,23 @@ public class CallItem extends ExpItemBase {
 	private final String IN_ALLTIME = "callinalltime";
 	private final String OUT_ALLTIME = "calloutalltime";
 
-	private final String PREF_IN_COMING_COUNT;
-	private final String PREF_OUT_COMING_COUNT;
-	private final String PREF_IN_ALLTIME;
-	private final String PREF_OUT_ALLTIME;
+	private final String PREF_IN_COMING_COUNT = IN_COMING_COUNT;
+	private final String PREF_OUT_COMING_COUNT = OUT_COMING_COUNT;
+	private final String PREF_IN_ALLTIME = IN_ALLTIME;
+	private final String PREF_OUT_ALLTIME = OUT_ALLTIME;
 
 	public final String ALERT_STRING = "電話資訊";
 
 	public CallItem(Service service) {
 		// TODO Auto-generated constructor stub
+
+		super(service);
+		mExpPrefix = "Call";
 		
-		mExpPrefix = "call.";
-		needTimeLimit = false;
-		
-		PREF_IN_COMING_COUNT = mExpPrefix + IN_COMING_COUNT;
-		PREF_OUT_COMING_COUNT = mExpPrefix + OUT_COMING_COUNT;
-		PREF_IN_ALLTIME = mExpPrefix + IN_ALLTIME;
-		PREF_OUT_ALLTIME = mExpPrefix + OUT_ALLTIME;
+//		PREF_IN_COMING_COUNT = mExpPrefix + IN_COMING_COUNT;
+//		PREF_OUT_COMING_COUNT = mExpPrefix + OUT_COMING_COUNT;
+//		PREF_IN_ALLTIME = mExpPrefix + IN_ALLTIME;
+//		PREF_OUT_ALLTIME = mExpPrefix + OUT_ALLTIME;
 
 	}
 
@@ -90,11 +90,11 @@ public class CallItem extends ExpItemBase {
 						+ time);
 				
 				inComingCount++;
-				if(mExpRealAttributesName.contains(PREF_IN_COMING_COUNT)) 
+				if(mExpRealAttributes.contains(PREF_IN_COMING_COUNT)) 
 					insertRecord(context, IN_COMING_COUNT, String.valueOf(inComingCount), time);
 				
 				inAllTime += duration;
-				if(mExpRealAttributesName.contains(PREF_IN_ALLTIME))
+				if(mExpRealAttributes.contains(PREF_IN_ALLTIME))
 					insertRecord(context, IN_ALLTIME, String.valueOf(inAllTime), time);
 				
 			//out call
@@ -103,14 +103,20 @@ public class CallItem extends ExpItemBase {
 						+ time);
 
 				outComingCount++;
-				if(mExpRealAttributesName.contains(PREF_OUT_COMING_COUNT))
+				if(mExpRealAttributes.contains(PREF_OUT_COMING_COUNT))
 					insertRecord(context, OUT_COMING_COUNT, String.valueOf(outComingCount), time);
 				
 				outAllTime += duration;
-				if(mExpRealAttributesName.contains(PREF_OUT_ALLTIME))
+				if(mExpRealAttributes.contains(PREF_OUT_ALLTIME))
 					insertRecord(context, OUT_ALLTIME, String.valueOf(outAllTime), time);
 			}
 		}
+	}
+
+	@Override
+	public boolean needTimeLimit() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }

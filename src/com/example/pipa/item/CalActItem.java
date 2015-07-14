@@ -22,23 +22,23 @@ public class CalActItem extends ExpItemBase {
 	private final String RECEIVE_NUMBER = "receivenumber";
 	private final String RECEIVE_TIME = "receivetime";
 
-	private final String PREF_CALL_NUMBER;
-	private final String PREF_CALL_TIME;
-	private final String PREF_RECEIVE_NUMBER;
-	private final String PREF_RECEIVE_TIME;
+	private final String PREF_CALL_NUMBER = CALL_NUMBER;
+	private final String PREF_CALL_TIME = CALL_TIME;
+	private final String PREF_RECEIVE_NUMBER = RECEIVE_NUMBER;
+	private final String PREF_RECEIVE_TIME = RECEIVE_TIME;
 	
 	public final String ALERT_STRING = "通話資訊";
 
 	public CalActItem(Service service) {
 		// TODO Auto-generated constructor stub
 
-		mExpPrefix = "callact.";
-		needTimeLimit = false;
+		super(service);
+		mExpPrefix = "CallAct";
 		
-		PREF_CALL_NUMBER = mExpPrefix + CALL_NUMBER;
-		PREF_CALL_TIME = mExpPrefix + CALL_TIME;
-		PREF_RECEIVE_NUMBER = mExpPrefix + RECEIVE_NUMBER;
-		PREF_RECEIVE_TIME = mExpPrefix + RECEIVE_TIME;
+//		PREF_CALL_NUMBER = mExpPrefix + CALL_NUMBER;
+//		PREF_CALL_TIME = mExpPrefix + CALL_TIME;
+//		PREF_RECEIVE_NUMBER = mExpPrefix + RECEIVE_NUMBER;
+//		PREF_RECEIVE_TIME = mExpPrefix + RECEIVE_TIME;
 	}
 
 	@SuppressLint("SimpleDateFormat")
@@ -85,12 +85,12 @@ public class CalActItem extends ExpItemBase {
 				Log.d("Jim", "Name:" + name + "Incoming:" + number + ", Time:"
 						+ time);
 				
-				if(mExpRealAttributesName.contains(PREF_RECEIVE_NUMBER))
+				if(mExpRealAttributes.contains(PREF_RECEIVE_NUMBER))
 					insertRecord(context, RECEIVE_NUMBER, 
 						cursor.getString(cursor.getColumnIndex(CallLog.Calls.NUMBER)), time);
 				
 				receiveTime += duration;
-				if(mExpRealAttributesName.contains(PREF_RECEIVE_TIME))
+				if(mExpRealAttributes.contains(PREF_RECEIVE_TIME))
 					insertRecord(context, RECEIVE_TIME, String.valueOf(receiveTime), time);
 				
 			//out call
@@ -98,15 +98,21 @@ public class CalActItem extends ExpItemBase {
 				Log.d("Jim", "Name:" + name + "Outcoming:" + number + ", Time:"
 						+ time);
 
-				if(mExpRealAttributesName.contains(PREF_CALL_NUMBER))
+				if(mExpRealAttributes.contains(PREF_CALL_NUMBER))
 					insertRecord(context, CALL_NUMBER, 
 						cursor.getString(cursor.getColumnIndex(CallLog.Calls.NUMBER)), time);
 				
 				callTime += duration;
-				if(mExpRealAttributesName.contains(PREF_CALL_TIME))
+				if(mExpRealAttributes.contains(PREF_CALL_TIME))
 					insertRecord(context, CALL_TIME, String.valueOf(callTime), time);
 			}
 		}
+	}
+
+	@Override
+	public boolean needTimeLimit() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }

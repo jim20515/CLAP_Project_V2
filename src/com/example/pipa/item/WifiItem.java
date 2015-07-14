@@ -20,19 +20,19 @@ public class WifiItem extends ExpItemBase {
 	private final String SSID = "ssid";
 	private final String RSSI = "rssi";
 
-	private final String PREF_SSID;
-	private final String PREF_RSSI;
+	private final String PREF_SSID = SSID;
+	private final String PREF_RSSI = RSSI;
 
 	public final String ALERT_STRING = "WiFI資訊";
 
 	public WifiItem(Service service) {
 		// TODO Auto-generated constructor stub
 
-		mExpPrefix = "wifi.";
-		needTimeLimit = true;
+		super(service);
+		mExpPrefix = "Wifi";
 
-		PREF_SSID = mExpPrefix + SSID;
-		PREF_RSSI = mExpPrefix + RSSI;
+//		PREF_SSID = mExpPrefix + SSID;
+//		PREF_RSSI = mExpPrefix + RSSI;
 	}
 
 	@Override
@@ -60,18 +60,18 @@ public class WifiItem extends ExpItemBase {
 		// TODO Auto-generated method stub
 		IntentFilter filter = new IntentFilter();
 
-		if (mExpRealAttributesName.contains(PREF_SSID)) {
-			filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+		if (mExpRealAttributes.contains(PREF_SSID)) {
+//			filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
 			filter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
 		}
 		
-		if (mExpRealAttributesName.contains(PREF_RSSI))
+		if (mExpRealAttributes.contains(PREF_RSSI))
 			filter.addAction(WifiManager.RSSI_CHANGED_ACTION);
 
 		return filter;
 	}
 
-	@SuppressWarnings({ "static-access", "deprecation" })
+	@SuppressWarnings({ "static-access"})
 	@Override
 	public boolean receiveBroadcast(Context context, Intent intent) {
 		// TODO Auto-generated method stub
@@ -96,29 +96,29 @@ public class WifiItem extends ExpItemBase {
 
 			return true;
 
-		} else if (intent.getAction().equals(
-				ConnectivityManager.CONNECTIVITY_ACTION)) {
-			NetworkInfo networkInfo = intent
-					.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
-			if (networkInfo.getType() == ConnectivityManager.TYPE_WIFI
-					&& !networkInfo.isConnected()) {
-				// Wifi is disconnected
-
-				WifiManager wifiManager = (WifiManager) context
-						.getSystemService(context.WIFI_SERVICE);
-				WifiInfo wifiInfo = wifiManager.getConnectionInfo();
-				String ssid = wifiInfo.getSSID();
-
-				if (SettingString.mIsDebug)
-					Log.d(mTag, "Wifi is disconnected: " + ssid);
-				insertRecord(context, SSID, ssid);
-			}
-
-			return true;
+//		} else if (intent.getAction().equals(
+//				ConnectivityManager.CONNECTIVITY_ACTION)) {
+//			NetworkInfo networkInfo = intent
+//					.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
+//			if (networkInfo.getType() == ConnectivityManager.TYPE_WIFI
+//					&& !networkInfo.isConnected()) {
+//				// Wifi is disconnected
+//
+//				WifiManager wifiManager = (WifiManager) context
+//						.getSystemService(context.WIFI_SERVICE);
+//				WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+//				String ssid = wifiInfo.getSSID();
+//
+//				if (SettingString.mIsDebug)
+//					Log.d(mTag, "Wifi is disconnected: " + ssid);
+//				insertRecord(context, SSID, ssid);
+//			}
+//
+//			return true;
 
 		} else if (WifiManager.RSSI_CHANGED_ACTION.equals(action)) {
 
-			if (mExpRealAttributesName.contains(PREF_RSSI)) {
+			if (mExpRealAttributes.contains(PREF_RSSI)) {
 				if (SettingString.mIsDebug)
 					Log.d(mTag, "Wifi RSSI Change");
 
@@ -130,6 +130,12 @@ public class WifiItem extends ExpItemBase {
 		}
 
 		return super.receiveBroadcast(context, intent);
+	}
+
+	@Override
+	public boolean needTimeLimit() {
+		// TODO Auto-generated method stub
+		return true;
 	}
 
 }

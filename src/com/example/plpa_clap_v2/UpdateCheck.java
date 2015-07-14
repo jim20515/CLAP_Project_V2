@@ -17,25 +17,25 @@
 //	public void onReceive(Context context, Intent intent) {
 //
 //		if (intent.getAction().toString().equals(HIPPO_SERVICE_IDENTIFIER)) {
-//			/* ¥HBundleª«¥ó¸Ñ¶}¶Ç¨Óªº°Ñ¼Æ */
+//			/* ä»¥Bundleç‰©ä»¶è§£é–‹å‚³ä¾†çš„åƒæ•¸ */
 //			Bundle mBundle01 = intent.getExtras();
 //			String strParam1 = "";
 //			String strParam2 = "";
 //			String strParam3 = "";
-//			/* ­YBundleª«¥ó¤£¬°ªÅ­È¡A¨ú¥X°Ñ¼Æ */
+//			/* è‹¥Bundleç‰©ä»¶ä¸ç‚ºç©ºå€¼ï¼Œå–å‡ºåƒæ•¸ */
 //			if (mBundle01 != null) {
-//				/* ±N¨ú¥XªºSTR_PARAM01°Ñ¼Æ¡A¦s©ñ©óstrParam1¦r¦ê¤¤ */
+//				/* å°‡å–å‡ºçš„STR_PARAM01åƒæ•¸ï¼Œå­˜æ”¾æ–¼strParam1å­—ä¸²ä¸­ */
 //				strParam1 = mBundle01.getString(SettingString.TEST_ID);
 //				strParam2 = mBundle01.getString(SettingString.TEST_SCRIPT);
 //				strParam3 = mBundle01.getString(SettingString.TEST_DESCRIPT);
 //				Log.v(TAG, "UpdateCheck" + strParam1 + strParam2 + strParam3);
 //			}
 //
-//			/* ©I¥s¥ÀÅéActivity¡A³ê¿ô­ì¥Dµ{¦¡ */
+//			/* å‘¼å«æ¯é«”Activityï¼Œå–šé†’åŸä¸»ç¨‹å¼ */
 //			Intent mRunPackageIntent = new Intent(context, MainActivity.class);
 //			mRunPackageIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 //			if (strParam1 != "") {
-//				/* ­«·s¹êÅçID¦^¶Ç */
+//				/* é‡æ–°å¯¦é©—IDå›å‚³ */
 //				mRunPackageIntent.putExtra(SettingString.ORIGIN_TEST_ID,
 //						strParam1);
 //				mRunPackageIntent.putExtra(SettingString.NEW_TEST_SCRIPT,

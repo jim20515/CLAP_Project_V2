@@ -1,19 +1,40 @@
 package com.example.plpa.utils;
 
-import java.io.InputStream;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.net.ssl.HttpsURLConnection;
+
+import org.apache.http.HttpException;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 public class ReadREST extends AsyncTask<String, Void, String> {
 
-	public static final String WEB_URI = "http://140.119.221.34";
-	public static final String WEBSERVICE_ID_URI = WEB_URI + "/ws/rc/getid";
-//	public static final String WEBSERVICE_ID_URI = "https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true&libraries=places";
-	public static final String WEBSERVICE_EXPLIST_URL = WEB_URI
-			+ "/ws/le/getall/Android/%s/%s/%s/%s";
-
+	public static final String WEB_URI = "http://140.119.163.68";
+	public static final String WEBSERVICE_ID_URI = WEB_URI + "/admin/DeviceInfoes/PostDeviceInfo";
+	public static final String PARAMETER_UUID = "UUID";
+	public static final String WEBSERVICE_EXPLIST_URL = WEB_URI + "/admin/ExperimentApply/GetExperimentList";
+	public static final String WEBSERVICE_EXPDETAIL_URL = WEB_URI + "/admin/ExperimentApply/GetExperimentDetail";
+	public static final String PARAMETER_EXPID = "expId";
+	
+	public static final String JSON_EXPLIST_NAME = "Experiment";
+	public static final String JSON_EXP_ID = "Id";
+	public static final String JSON_EXP_TITLE = "Title";
+	public static final String JSON_EXP_MODIFYTIME = "ModifyTime";
+	public static final String JSON_EXP_ITEM = "Item";
+	public static final String JSON_EXP_POLICY = "Policy";
+	
 	private String[] mReadURL;
 	
 	public AsyncResponse mAsyncDelegate = null;
@@ -46,26 +67,41 @@ public class ReadREST extends AsyncTask<String, Void, String> {
 
 		URL urlRESTLocation = null;
 		HttpURLConnection connREST = null;
-		StringBuffer out = new StringBuffer();
+		String response = "";
+		
 		try {
-			int iUrlCount = strUrlFile.length;
 			mReadURL = strUrlFile;
 			
-			for (int i = 0; i < iUrlCount; i++) {
-				urlRESTLocation = new URL(strUrlFile[i]);
-				connREST = (HttpURLConnection) urlRESTLocation.openConnection();
-				connREST.setDoInput(true);
+			urlRESTLocation = new URL(strUrlFile[0]);
+			connREST = (HttpURLConnection) urlRESTLocation.openConnection();
+			connREST.setDoInput(true);
+			connREST.setRequestMethod("POST");
+			
+			if(strUrlFile.length > 1) {
+				OutputStream os = connREST.getOutputStream();
+	            BufferedWriter writer = new BufferedWriter(
+	                    new OutputStreamWriter(os, "UTF-8"));
+	            writer.write(strUrlFile[1]);
 
-				InputStream in = connREST.getInputStream();
-				out = new StringBuffer();
-
-				byte[] buffer = new byte[4096];
-				int n = 1;
-
-				while ((n = in.read(buffer)) != -1) {
-					out.append(new String(buffer, 0, n));
-				}
+	            writer.flush();
+	            writer.close();
+	            os.close();
 			}
+			
+            int responseCode = connREST.getResponseCode();
+
+            if (responseCode == HttpsURLConnection.HTTP_OK) {
+                String line;
+                BufferedReader br=new BufferedReader(new InputStreamReader(connREST.getInputStream()));
+                while ((line=br.readLine()) != null) {
+                    response+=line;
+                }
+            }
+            else {
+                response="";
+
+                throw new HttpException(responseCode+"");
+            }
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -77,6 +113,25 @@ public class ReadREST extends AsyncTask<String, Void, String> {
 			}
 		}
 
-		return out.toString();
+		if(SettingString.mIsDebug)Log.d(SettingString.TAG, "Get response:" + response);
+		
+		return response;
 	}
+	
+	public static String getPostDataString(HashMap<String, String> params) throws UnsupportedEncodingException{
+        StringBuilder result = new StringBuilder();
+        boolean first = true;
+        for(Map.Entry<String, String> entry : params.entrySet()){
+            if (first)
+                first = false;
+            else
+                result.append("&");
+
+            result.append(URLEncoder.encode(entry.getKey(), "UTF-8"));
+            result.append("=");
+            result.append(URLEncoder.encode(entry.getValue(), "UTF-8"));
+        }
+
+        return result.toString();
+    }
 }

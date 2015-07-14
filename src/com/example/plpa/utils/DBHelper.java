@@ -77,6 +77,7 @@ public class DBHelper extends SQLiteOpenHelper {
         values.put(ATTR, record.getAttr());
         values.put(ATTRVAL, record.getAttrval());
         if(record.getDateTime() != null) values.put(DATETIME, record.getDateTime());
+        
         db.insertOrThrow(TABLE_NAME, null, values);
         db.close(); // Closing database connection
     }

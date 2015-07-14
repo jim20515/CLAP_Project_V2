@@ -4,13 +4,19 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 public class PreferenceHelper {
-	public static final String PREF_FILENAME = "projectclap"; // ¤w¤ÀªR¹êÅç³]©w°Ñ¼ÆXMLÀÉ¦W
-	public static final String PREF_SCRIPT = "projectscript"; // ¤w¤ÀªR¹êÅç³]©w°Ñ¼ÆScript»¡©ú
+	public static final String PREF_FILENAME = "projectclap"; // ï¿½wï¿½ï¿½ï¿½Rï¿½ï¿½ï¿½ï¿½]ï¿½wï¿½Ñ¼ï¿½XMLï¿½É¦W
+//	public static final String PREF_SCRIPT = "projectscript"; // ï¿½wï¿½ï¿½ï¿½Rï¿½ï¿½ï¿½ï¿½]ï¿½wï¿½Ñ¼ï¿½Scriptï¿½ï¿½ï¿½ï¿½
+//	public static final String PREF_MODIFYTIME = "ModifyTime";
+//	public static final String PREF_ITEM = "Item";
+//	public static final String PREF_POLICY = "Policy";
+//	public static final String PREF_DESCRIPTION = "Description";
+	public static final String PREF_EXPAPPLY = "pref_expapply";
+	
 	public static final String XML_PATH = "/data/data/com.example.plpa_clap_v2/shared_prefs/" + PREF_FILENAME + ".xml";
 
-	public static final String ID_CHECK = "checkid"; // ¹êÅçID°Ñ¼ÆXMLÀÉ¦W
-	public static final String CLIENT_DEVICE_ID = "clientdeviceid";
-	public static final String AUTH_CODE = "authcode";
+	public static final String ID_CHECK = "checkid"; // ï¿½ï¿½ï¿½ï¿½IDï¿½Ñ¼ï¿½XMLï¿½É¦W
+	public static final String CLIENT_DEVICE_ID = "DevicesID";
+	public static final String AUTH_CODE = "AuthCode";
 	public static final String UPLOADED_TIME = "upload_time";
 	
 	public static boolean setPreference(Context context, String key, String value) {

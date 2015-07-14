@@ -1,6 +1,8 @@
 package com.example.plpa_clap_v2;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -15,6 +17,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.Settings.Secure;
 import android.text.format.Time;
 import android.util.Log;
 import android.view.Menu;
@@ -23,14 +26,20 @@ import android.widget.Button;
 
 import com.example.plpa.utils.CommonAlertDialog;
 import com.example.plpa.utils.Connectivity;
-import com.example.plpa.utils.ExpUrlToken;
+import com.example.plpa.utils.ExpApplyJson;
 import com.example.plpa.utils.PreferenceHelper;
 import com.example.plpa.utils.ReadREST;
 import com.example.plpa.utils.ReadREST.AsyncResponse;
 import com.example.plpa.utils.SettingString;
+import com.google.gson.Gson;
 
 public class MainActivity extends Activity implements AsyncResponse {
 
+	class ExpDialogClass {
+		public String Id;
+		public String Name;
+	}
+	
 	private final boolean mIsDebug = SettingString.mIsDebug;
 	private Button mBtnLoadDSL;
 	private Button mBtnStart;
@@ -38,62 +47,27 @@ public class MainActivity extends Activity implements AsyncResponse {
 	// private TextView mDSLTxtView;
 	private Context mContext = this;
 
-	private ExpUrlToken mExpChoice;
+	private ExpDialogClass mExpChoice;
 
 	private String mClicentDeviceID;
 	private String mAuthCode;
 	private String mDeviceOs;
 	private String mDevice;
-	private String mExid = "";
+	private String mUUID;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
+		// å–å¾—ä½¿ç”¨è€…æ‰‹æ©Ÿå‹è™Ÿå’ŒOSç‰ˆæœ¬
+		mDeviceOs = android.os.Build.VERSION.RELEASE;
+		mDevice = android.os.Build.MODEL.replace(' ', '-');
+		mUUID = Secure.getString(getContentResolver(), Secure.ANDROID_ID);
+
 		initView();
 		loadClientId();
 		// initExpItem();
-
-		// ¨ú±o¨Ï¥ÎªÌ¤â¾÷«¬¸¹©MOSª©¥»
-		mDeviceOs = android.os.Build.VERSION.RELEASE;
-		mDevice = android.os.Build.MODEL.replace(' ', '-');
-
-		// // ¹êÅç³]©wÀÉ§ó·s
-		// Bundle mBundle01 = this.getIntent().getExtras();
-		// if (mBundle01 != null) {
-		// mExid = mBundle01.getString(SettingString.ORIGIN_TEST_ID);
-		// mContents = mBundle01.getString(SettingString.NEW_TEST_SCRIPT);
-		// mTestDescript = mBundle01
-		// .getString(SettingString.NEW_TEST_DESCRIPT);
-		//
-		// if (mExid != null) {
-		// StopService();
-		// Log.v(SettingString.TAG, "refind TestId" + mExid);
-		// reFindTest(mContents); // ­«·s±N·s¹êÅç³]©wÀÉ§@¤ÀªR
-		// Log.v(SettingString.TAG, "retrun PLPA_CLAP sucessful");
-		// mDSLTxtView.setText(mTestDescript);
-		// new AlertDialog.Builder(mContext)
-		// .setMessage("¹êÅç¦³§ó·s")
-		// .setPositiveButton(R.string.update,
-		// new DialogInterface.OnClickListener() { // ½T»{§ó·s
-		// public void onClick(DialogInterface dialog,
-		// int whichButton) {
-		// testfileCheck(); // §R°£ÂÂ¹êÅç°Ñ¼Æ¡A²£¥Í·s¹êÅç°Ñ¼ÆÀÉ
-		// mDSLTxtView.setText(mTestDescript);
-		// startRecording();
-		// Log.v(SettingString.TAG, "update sucessful");
-		// }
-		// })
-		// .setNegativeButton(R.string.str_no,
-		// new DialogInterface.OnClickListener() {
-		// public void onClick(DialogInterface dialog,
-		// int whichButton) {
-		// // finish();
-		// }
-		// }).show();
-		// }
-		// }
 
 	}
 
@@ -120,11 +94,11 @@ public class MainActivity extends Activity implements AsyncResponse {
 		return true;
 	}
 
-	// ¨ú±o¨ü´úªÌID©M±ÂÅv½X
+	// å–å¾—å—æ¸¬è€…IDå’Œæˆæ¬Šç¢¼
 	private void loadClientId() {
 		// TODO Auto-generated method stub
 
-		// À³¸Ó¥i¥H¥ÎSharedPreferences¨ÓÀË¬d
+		// æ‡‰è©²å¯ä»¥ç”¨SharedPreferencesä¾†æª¢æŸ¥
 		File f = new File(PreferenceHelper.XML_PATH);
 		if (f.exists()) {
 			Log.v(SettingString.TAG, "SharedPreferences checkid : exist");
@@ -136,32 +110,44 @@ public class MainActivity extends Activity implements AsyncResponse {
 		} else {
 			Log.v(SettingString.TAG, "New checkId url:"
 					+ ReadREST.WEBSERVICE_ID_URI);
-			ReadREST readREST = new ReadREST();
-			readREST.execute(ReadREST.WEBSERVICE_ID_URI); // ¨ü´úªÌID©M±ÂÅv½XRESTFUL
-			readREST.mAsyncDelegate = this;
+
+			HashMap<String, String> paras = new HashMap<String, String>();
+			paras.put(ReadREST.PARAMETER_UUID, mUUID);
+
+			try {
+
+				ReadREST readREST = new ReadREST();
+				readREST.execute(ReadREST.WEBSERVICE_ID_URI,
+						ReadREST.getPostDataString(paras)); // å—æ¸¬è€…IDå’Œæˆæ¬Šç¢¼RESTFUL
+				readREST.mAsyncDelegate = this;
+
+			} catch (UnsupportedEncodingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 
 		}
 
 	}
 
-	// ¦U«ö¶sÄ²µo¨Æ¥ó
+	// å„æŒ‰éˆ•è§¸ç™¼äº‹ä»¶
 	public void onClick(View v) {
 
 		if (mClicentDeviceID == null || mClicentDeviceID.equals("")) {
-			CommonAlertDialog.showOKAlertDialog(this, "Server³sµ²¿ù»~¡A½Ğ¹Á¸Õ­«·s³s½u");
+			CommonAlertDialog.showOKAlertDialog(this, "Device IDç‚ºç©ºå€¼ï¼Œè«‹å˜—è©¦é‡æ–°é–‹å•Ÿ");
 			return;
 		}
 
 		switch (v.getId()) {
 		case R.id.button_load:
-			loadDSL(); // ¨ú±o¹êÅç¦Cªí
+			loadDSL(); // å–å¾—å¯¦é©—åˆ—è¡¨
 			break;
 		case R.id.button_start:
-			startRecording(); // ­«·s«ì´_´_¿ı
+			startRecording(); // é‡æ–°æ¢å¾©å¾©éŒ„
 
 			break;
 		case R.id.button_end:
-			StopService(); // °±¤î°O¿ı
+			StopService(); // åœæ­¢è¨˜éŒ„
 
 			break;
 		default:
@@ -169,32 +155,30 @@ public class MainActivity extends Activity implements AsyncResponse {
 		}
 	}
 
-	// ¨ú±o¹êÅç¦Cªí
+	// å–å¾—å¯¦é©—åˆ—è¡¨
 	private void loadDSL() {
-		if (Connectivity.isConnected(this)) { // °»´ú¦³µLºô¸ôª¬ºA
+		if (Connectivity.isConnected(this)) { // åµæ¸¬æœ‰ç„¡ç¶²è·¯ç‹€æ…‹
 			loadExperimentList();
 
-		} else { // °»´ú¨S¦³ºô¸ô¡A´£¿ô¶}±Òºô¸ô¥\¯à
-			CommonAlertDialog.showOKAlertDialog(this, "¬°¤è«K¹êÅç¡A½Ğ¶}±ÒµL½uºô¸ô¥\¯à");
+		} else { // åµæ¸¬æ²’æœ‰ç¶²è·¯ï¼Œæé†’é–‹å•Ÿç¶²è·¯åŠŸèƒ½
+			CommonAlertDialog.showOKAlertDialog(this, "ç‚ºæ–¹ä¾¿å¯¦é©—ï¼Œè«‹é–‹å•Ÿç„¡ç·šç¶²è·¯åŠŸèƒ½");
 		}
 	}
 
-	// ¨ú±o¹êÅç¦Cªí
+	// å–å¾—å¯¦é©—åˆ—è¡¨
 	private void loadExperimentList() {
 		// REST
-		String abc = String.format(ReadREST.WEBSERVICE_EXPLIST_URL, mDeviceOs,
-				mDevice, mClicentDeviceID, mAuthCode);
-		if (mIsDebug)
-			Log.d(SettingString.TAG, "Load Experiment Url:" + abc);
+
 		ReadREST readREST = new ReadREST();
-		readREST.execute(String.format(ReadREST.WEBSERVICE_EXPLIST_URL,
-				mDeviceOs, mDevice, mClicentDeviceID, mAuthCode));
+		// readREST.execute(String.format(ReadREST.WEBSERVICE_EXPLIST_URL,
+		// mDeviceOs, mDevice, mClicentDeviceID, mAuthCode));
+		readREST.execute(ReadREST.WEBSERVICE_EXPLIST_URL);
 		readREST.mAsyncDelegate = this;
 
 	}
 
-	// ±N¹êÅç¦Cªí¥H¿ï³æ¤è¦¡´£¨Ñ¨ü´úªÌ¿ï¨ú
-	private void ShowExpList(final ExpUrlToken[] expList) {
+	// å°‡å¯¦é©—åˆ—è¡¨ä»¥é¸å–®æ–¹å¼æä¾›å—æ¸¬è€…é¸å–
+	private void ShowExpList(final ExpDialogClass[] expList) {
 		AlertDialog.Builder builder = new Builder(this);
 
 		builder.setTitle("Choose an experiment");
@@ -205,7 +189,7 @@ public class MainActivity extends Activity implements AsyncResponse {
 		} else {
 			expNames = new String[expList.length];
 			for (int i = 0; i < expList.length; i++) {
-				expNames[i] = expList[i].mName;
+				expNames[i] = expList[i].Name;
 			}
 
 		}
@@ -214,44 +198,20 @@ public class MainActivity extends Activity implements AsyncResponse {
 			public void onClick(DialogInterface dialog, int which) {
 
 				mExpChoice = expList[which];
-				mExid = mExpChoice.mId;
 
-				final String expScript = mExpChoice.mScript;
-				if (mIsDebug)
-					Log.d(SettingString.TAG, expScript);
+				HashMap<String, String> params = new HashMap<String, String>();
+				params.put(ReadREST.PARAMETER_EXPID, mExpChoice.Id);
 
-				String descriptionString = ExpUrlToken
-						.getExpDescription(expScript);
+				try {
+					ReadREST readREST = new ReadREST();
+					readREST.execute(ReadREST.WEBSERVICE_EXPDETAIL_URL,
+							ReadREST.getPostDataString(params));
 
-				String strDialogTitle = getString(R.string.str_alert_title);
-
-				CommonAlertDialog.showAlertDialog(mContext, strDialogTitle,
-						descriptionString, true,
-						new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog,
-									int whichButton) // ½T»{«á¶}©l·P´ú
-							{
-								PreferenceHelper
-										.setPreference(mContext,
-												PreferenceHelper.PREF_SCRIPT,
-												expScript);
-								PreferenceHelper.setPreference(mContext,
-										PreferenceHelper.ID_CHECK, mExid);
-
-								Time time = new Time();
-								time.setToNow();
-
-								PreferenceHelper.setPreference(mContext,
-										PreferenceHelper.UPLOADED_TIME,
-										time.toMillis(false));
-
-								startRecording();
-								dialog.dismiss();
-
-							}
-
-						});
-
+					readREST.mAsyncDelegate = MainActivity.this;
+				} catch (UnsupportedEncodingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		});
 
@@ -273,13 +233,13 @@ public class MainActivity extends Activity implements AsyncResponse {
 
 		Log.v(SettingString.TAG, "Start Recording");
 		Intent intent = new Intent();
-		intent.setClass(this, LogService.class); // Âà´«¦Ü«áºİLogService
-		startService(intent);// ¦n¹³¨S¦³Start service
+		intent.setClass(this, LogService.class); // è½‰æ›è‡³å¾Œç«¯LogService
+		startService(intent);
 		finish();
 
 	}
 
-	// °±¤î«áºİ°O¿ı¡A«áºİLogServiceÂà´«¦ÜPLPA_CLAP
+	// åœæ­¢å¾Œç«¯è¨˜éŒ„ï¼Œå¾Œç«¯LogServiceè½‰æ›è‡³PLPA_CLAP
 	private void StopService() {
 		try {
 			updateUI(false);
@@ -311,66 +271,92 @@ public class MainActivity extends Activity implements AsyncResponse {
 	public void processFinish(String[] urls, String result) {
 		// TODO Auto-generated method stub
 
-		if (urls.length == 1) {
-			Log.d(SettingString.TAG, "process finish, url=" + urls[0]);
+		Log.d(SettingString.TAG, "process finish, url=" + urls[0]);
 
-			String url = urls[0];
+		String url = urls[0];
 
-			if (mIsDebug)
-				Log.d(SettingString.TAG, url);
+		if (mIsDebug)
+			Log.d(SettingString.TAG, url);
 
-			try {
-				JSONObject urlResult = new JSONObject(result);
-				if (urlResult.length() > 0) {
-					if (ReadREST.WEBSERVICE_ID_URI.equals(url)) {
-						mClicentDeviceID = urlResult
-								.getString(PreferenceHelper.CLIENT_DEVICE_ID);
-						mAuthCode = urlResult
-								.getString(PreferenceHelper.AUTH_CODE);
-						// ClicentDeviceID = "262";
-						// AuthCode = "52bceea3e55a6e2fdee85b30efc8fa71";
+		try {
+			JSONObject urlResult = new JSONObject(result);
+			if (urlResult.length() > 0) {
+				if (ReadREST.WEBSERVICE_ID_URI.equals(url)) {
+					mClicentDeviceID = urlResult
+							.getString(PreferenceHelper.CLIENT_DEVICE_ID);
+					mAuthCode = urlResult.getString(PreferenceHelper.AUTH_CODE);
+					// ClicentDeviceID = "262";
+					// AuthCode = "52bceea3e55a6e2fdee85b30efc8fa71";
 
-						Log.v(SettingString.TAG, "ClicentDeviceID"
-								+ mClicentDeviceID + "AuthCode" + mAuthCode);
-						PreferenceHelper.setPreference(this,
-								PreferenceHelper.CLIENT_DEVICE_ID,
-								mClicentDeviceID);
-						PreferenceHelper.setPreference(this,
-								PreferenceHelper.AUTH_CODE, mAuthCode);
+					Log.v(SettingString.TAG, "ClicentDeviceID"
+							+ mClicentDeviceID + "AuthCode" + mAuthCode);
+					PreferenceHelper
+							.setPreference(this,
+									PreferenceHelper.CLIENT_DEVICE_ID,
+									mClicentDeviceID);
+					PreferenceHelper.setPreference(this,
+							PreferenceHelper.AUTH_CODE, mAuthCode);
 
-					} else if (String.format(ReadREST.WEBSERVICE_EXPLIST_URL,
-							mDeviceOs, mDevice, mClicentDeviceID, mAuthCode)
-							.equals(url)) {
-						JSONArray experiments = urlResult
-								.getJSONArray("experiment");
-						int count = experiments.length();
+				} else if (ReadREST.WEBSERVICE_EXPLIST_URL.equals(url)) {
+					JSONArray experiments = urlResult
+							.getJSONArray(ReadREST.JSON_EXPLIST_NAME);
 
-						ExpUrlToken[] expList = new ExpUrlToken[count];
+					int count = experiments.length();
 
-						for (int i = 0; i < experiments.length(); i++) {
-							JSONObject experiment = experiments
-									.getJSONObject(i);
-							ExpUrlToken expInfo = new ExpUrlToken();
+					ExpDialogClass[] expList = new ExpDialogClass[count];
 
-							expInfo.mId = experiment.getString("experimentId");
-							expInfo.mName = experiment.getString("name");
-							expInfo.mDescription = experiment
-									.getString("description");
-							expInfo.mScript = experiment.getString("script");
+					for (int i = 0; i < experiments.length(); i++) {
+						JSONObject experiment = experiments.getJSONObject(i);
+						ExpDialogClass expInfo = new ExpDialogClass();
 
-							expList[i] = expInfo;
-						}
+						expInfo.Id = experiment
+								.getString(ReadREST.JSON_EXP_ID);
+						expInfo.Name = experiment
+								.getString(ReadREST.JSON_EXP_TITLE);
 
-						ShowExpList(expList);
+						expList[i] = expInfo;
 					}
+
+					ShowExpList(expList);
+					
+				} else if (ReadREST.WEBSERVICE_EXPDETAIL_URL.equals(url)) {
+					
+					Gson gson = new Gson();
+					ExpApplyJson expApply = gson.fromJson(result, ExpApplyJson.class);
+
+					String strDialogTitle = getString(R.string.str_alert_title);
+
+					final String finalResult = result;
+					
+					CommonAlertDialog.showAlertDialog(mContext, strDialogTitle,
+							expApply.Description, true,
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int whichButton) // ç¢ºèªå¾Œé–‹å§‹æ„Ÿæ¸¬
+								{
+									PreferenceHelper.setPreference(mContext,
+											PreferenceHelper.PREF_EXPAPPLY, finalResult);
+									
+									Time time = new Time();
+									time.setToNow();
+
+									PreferenceHelper.setPreference(mContext,
+											PreferenceHelper.UPLOADED_TIME,
+											time.toMillis(false));
+
+									startRecording();
+									dialog.dismiss();
+
+								}
+
+							});
 				}
-
-			} catch (JSONException e) {
-				e.printStackTrace();
-
-				CommonAlertDialog.showOKAlertDialog(this, "Server³sµ²¿ù»~¡A½Ğ¹Á¸Õ­«·s³s½u");
 			}
 
+		} catch (JSONException e) {
+			e.printStackTrace();
+
+			CommonAlertDialog.showOKAlertDialog(this, "Serveré€£çµéŒ¯èª¤ï¼Œè«‹å˜—è©¦é‡æ–°é€£ç·š");
 		}
 
 	}
