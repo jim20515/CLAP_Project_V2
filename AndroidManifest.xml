@@ -50,7 +50,7 @@
         
         <service android:name=".LogService"/>
                 
-        <receiver android:name=".LogService$EventReceiver">
+        <!-- <receiver android:name=".LogService$EventReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.BATTERY_LOW" />
@@ -58,7 +58,7 @@
                 <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
                 <action android:name="android.intent.action.NEW_OUTGOING_CALL" />
             </intent-filter>
-        </receiver>
+        </receiver> -->
     </application>
 
 </manifest>

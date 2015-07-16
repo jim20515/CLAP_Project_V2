@@ -18,6 +18,7 @@ import com.example.plpa.utils.ExpApplyJson;
 public abstract class ExpItemBase {
 	
 	public Service mService;
+	private DBHelper mHelper;
 	public String mExpPrefix;
 	public ArrayList<ExpApplyJson.Item> mExpRealAttributes;
 	public final int TimeLimit = 30;
@@ -35,6 +36,8 @@ public abstract class ExpItemBase {
 		mExpRealAttributes = new ArrayList<ExpApplyJson.Item>();
 		
 		mService = service;
+
+		mHelper = new DBHelper(service);
 	};
 
 	public abstract boolean needTimeLimit();
@@ -63,8 +66,12 @@ public abstract class ExpItemBase {
 	}
 	public void receiveIntervalEvent(Context c, Intent i) {return ;}
 	public void onDestroy(){
-		if(needTimeLimit())
-			mService.unregisterReceiver(br);
+		try {
+			if(br != null)
+				mService.unregisterReceiver(br);
+		} catch (Exception e){
+			
+		}
 	}
 	
 	public boolean receiveBroadcast(Context context, Intent intent) {return false;}
@@ -84,15 +91,14 @@ public abstract class ExpItemBase {
 	
 	public void insertRecord(Context context, String attr, String value, String dateTime) {
 		DbConstants dbItem = new DbConstants();
-		
+
 //		dbItem.setItem(mExpPrefix.replace(".", ""));
 		dbItem.setItem(mExpPrefix);
 		dbItem.setAttr(attr);
 		dbItem.setAttrval(value);
 		if(dateTime != null) dbItem.setDateTime(dateTime);
 		
-		DBHelper helper = new DBHelper(context);
-		helper.addRecord(dbItem);
+		mHelper.addRecord(dbItem);
 		
 	}
 	

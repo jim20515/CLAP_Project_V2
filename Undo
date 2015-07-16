@@ -1,2 +1,3 @@
-1.broadcast exception
-2.start service 要兩次
+第一次ID會找不到
+2.start service 要兩次（應該是load experiment的問題)
+SQLiteOpenHelper db 無法insert

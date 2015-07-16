@@ -35,7 +35,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
 	@Override
 	public void onCreate(SQLiteDatabase db) {
-		final String INIT_TABLE = "CREATE TABLE " + TABLE_NAME + " (" + _ID
+		final String INIT_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" + _ID
 				+ " INTEGER PRIMARY KEY AUTOINCREMENT, "
 				+ ITEM + " TEXT, " + ATTR + " TEXT, " + ATTRVAL + " TEXT, "
 				+ DATETIME + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP);";
@@ -86,11 +86,12 @@ public class DBHelper extends SQLiteOpenHelper {
         String countQuery = "SELECT  * FROM " + TABLE_NAME;
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(countQuery, null);
+        int count = cursor.getCount();
         cursor.close();
         //jim
         db.close();
         // return count
-        return cursor.getCount();
+        return count;
     }
     
     public List<DbConstants> getAllTodoItems() {
@@ -98,12 +99,13 @@ public class DBHelper extends SQLiteOpenHelper {
         // Select All Query
         String selectQuery = "SELECT  * FROM " + TABLE_NAME;
 
-        SQLiteDatabase db = this.getWritableDatabase();
+        SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
 
         // looping through all rows and adding to list
         if (cursor.moveToFirst()) {
             do {
+
             	DbConstants item = new DbConstants();
                 item.setId(cursor.getInt(cursor.getColumnIndex(BaseColumns._ID)));
 //                item.setUuid(cursor.getString(cursor.getColumnIndex(UUID)));
@@ -113,6 +115,7 @@ public class DBHelper extends SQLiteOpenHelper {
 //                item.setExId(cursor.getString(cursor.getColumnIndex(EXID)));
 //                item.setDeviceId(cursor.getString(cursor.getColumnIndex(DEVICEID)));
                 item.setItem(cursor.getString(cursor.getColumnIndex(ITEM)));
+                
                 // Adding todo item to list
                 records.add(item);
             } while (cursor.moveToNext());

@@ -49,10 +49,10 @@ public class MainActivity extends Activity implements AsyncResponse {
 
 	private ExpDialogClass mExpChoice;
 
-	private String mClicentDeviceID;
+	private int mClicentDeviceID;
 	private String mAuthCode;
-	private String mDeviceOs;
-	private String mDevice;
+//	private String mDeviceOs;
+//	private String mDevice;
 	private String mUUID;
 
 	@Override
@@ -61,8 +61,8 @@ public class MainActivity extends Activity implements AsyncResponse {
 		setContentView(R.layout.activity_main);
 
 		// 取得使用者手機型號和OS版本
-		mDeviceOs = android.os.Build.VERSION.RELEASE;
-		mDevice = android.os.Build.MODEL.replace(' ', '-');
+//		mDeviceOs = android.os.Build.VERSION.RELEASE;
+//		mDevice = android.os.Build.MODEL.replace(' ', '-');
 		mUUID = Secure.getString(getContentResolver(), Secure.ANDROID_ID);
 
 		initView();
@@ -102,7 +102,7 @@ public class MainActivity extends Activity implements AsyncResponse {
 		File f = new File(PreferenceHelper.XML_PATH);
 		if (f.exists()) {
 			Log.v(SettingString.TAG, "SharedPreferences checkid : exist");
-			mClicentDeviceID = PreferenceHelper.getString(this,
+			mClicentDeviceID = PreferenceHelper.getInt(this,
 					PreferenceHelper.CLIENT_DEVICE_ID);
 			mAuthCode = PreferenceHelper.getString(this,
 					PreferenceHelper.AUTH_CODE);
@@ -133,7 +133,7 @@ public class MainActivity extends Activity implements AsyncResponse {
 	// 各按鈕觸發事件
 	public void onClick(View v) {
 
-		if (mClicentDeviceID == null || mClicentDeviceID.equals("")) {
+		if (mClicentDeviceID == -1) {
 			CommonAlertDialog.showOKAlertDialog(this, "Device ID為空值，請嘗試重新開啟");
 			return;
 		}
@@ -283,7 +283,9 @@ public class MainActivity extends Activity implements AsyncResponse {
 			if (urlResult.length() > 0) {
 				if (ReadREST.WEBSERVICE_ID_URI.equals(url)) {
 					mClicentDeviceID = urlResult
-							.getString(PreferenceHelper.CLIENT_DEVICE_ID);
+							.getInt(PreferenceHelper.CLIENT_DEVICE_ID);
+					
+					
 					mAuthCode = urlResult.getString(PreferenceHelper.AUTH_CODE);
 					// ClicentDeviceID = "262";
 					// AuthCode = "52bceea3e55a6e2fdee85b30efc8fa71";

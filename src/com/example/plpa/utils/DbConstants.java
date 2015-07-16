@@ -8,7 +8,7 @@ public class DbConstants implements BaseColumns {
 	public static final String ITEM = "item";
 	public static final String ATTR = "attribute";
 	public static final String ATTRVAL = "value";
-	public static final String DATETIME = "dateime";
+	public static final String DATETIME = "datetime";
 //	public static final String EXID = "exid";
 //	public static final String DEVICEID = "clientdeviceid";
 	

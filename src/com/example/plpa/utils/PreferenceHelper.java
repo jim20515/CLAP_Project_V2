@@ -47,11 +47,29 @@ public class PreferenceHelper {
 		return true;
 	}
 	
+	public static boolean setPreference(Context context, String key, int value) {
+		SharedPreferences.Editor editor = context.getSharedPreferences(PREF_FILENAME, 
+				Context.MODE_PRIVATE).edit();
+		
+		editor.putInt(key, value);
+		editor.commit();
+		
+		return true;
+	}
+	
 	public static long getLong(Context context, String key) {
 		SharedPreferences preferences = context.getSharedPreferences(PREF_FILENAME, 
 				Context.MODE_PRIVATE);
 		
 		return preferences.getLong(key, -1);
+				
+	}
+	
+	public static int getInt(Context context, String key) {
+		SharedPreferences preferences = context.getSharedPreferences(PREF_FILENAME, 
+				Context.MODE_PRIVATE);
+		
+		return preferences.getInt(key, -1);
 				
 	}
 }
