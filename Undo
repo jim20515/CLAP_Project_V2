@@ -1,3 +1,7 @@
 第一次ID會找不到
-2.start service 要兩次（應該是load experiment的問題)
-SQLiteOpenHelper db 無法insert
+load experiemnt list應該連description一起撈
+service會死掉
+
+Not yet
+Temp
+pres

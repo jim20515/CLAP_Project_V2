@@ -10,22 +10,22 @@ import android.util.Log;
 
 import com.example.plpa.utils.SettingString;
 
-public class TempItem extends ExpItemBase implements SensorEventListener {
+public class PresItem extends ExpItemBase implements SensorEventListener {
 
 	private final String mTag = SettingString.TAG;
 
 	private SensorManager mSensorManager;
-    private Sensor mTemperature;
+    private Sensor mPressureSensor;
 
-	private final String TEMPERATURE_X = "temp";
+	private final String PRESSURE = "pres";
 	
 //	public final String ALERT_STRING = "加速度感測器";
 
-	public TempItem(Service service) {
+	public PresItem(Service service) {
 		// TODO Auto-generated constructor stub
 
 		super(service);
-		mExpPrefix = "Temp";
+		mExpPrefix = "Pres";
 		
 	}
 
@@ -35,28 +35,26 @@ public class TempItem extends ExpItemBase implements SensorEventListener {
 
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public void onSensorChanged(SensorEvent event) {
 		// TODO Auto-generated method stub
-		if (event.sensor.getType() == Sensor.TYPE_TEMPERATURE) {
+		if (event.sensor.getType() == Sensor.TYPE_PRESSURE) {
 
-			float temp = event.values[0];
+			float pres = event.values[0];
 			
-			insertRecord(mService, TEMPERATURE_X, temp);
+			insertRecord(mService, PRESSURE, pres);
 			
-			if(SettingString.mIsDebug) Log.d(mTag, "Temp:" + temp);
+			if(SettingString.mIsDebug) Log.d(mTag, "Pres:" + pres);
 		}
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public boolean onStart(Context context) {
 		// TODO Auto-generated method stub
 		mSensorManager = (SensorManager)mService.getSystemService(Context.SENSOR_SERVICE);
-		mTemperature = mSensorManager.getDefaultSensor(Sensor.TYPE_TEMPERATURE);
+		mPressureSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE);
         
-        mSensorManager.registerListener(this, mTemperature, SensorManager.SENSOR_DELAY_UI);
+        mSensorManager.registerListener(this, mPressureSensor, SensorManager.SENSOR_DELAY_UI);
         
 		return super.onStart(context);
 	}

@@ -1,7 +1,11 @@
 package com.example.pipa.item;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.app.Service;
 import android.content.Context;
+import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -17,7 +21,15 @@ public class OriItem extends ExpItemBase implements SensorEventListener {
 	private SensorManager mSensorManager;
     private Sensor mOrientation;
 
-	public final String ALERT_STRING = "加速度感測器";
+    float newX;
+	float newY;
+	float newZ;
+	
+	private final String ORIENTATION_X = "ox";
+	private final String ORIENTATION_Y = "oy";
+	private final String ORIENTATION_Z = "oz";
+	
+	public final String ALERT_STRING = "方向感測器";
 
 	public OriItem(Service service) {
 		// TODO Auto-generated constructor stub
@@ -39,11 +51,11 @@ public class OriItem extends ExpItemBase implements SensorEventListener {
 		// TODO Auto-generated method stub
 		if (event.sensor.getType() == Sensor.TYPE_ORIENTATION) {
 
-			float newX = event.values[SensorManager.DATA_X];
-			float newY = event.values[SensorManager.DATA_Y];
-			float newZ = event.values[SensorManager.DATA_Z];
+			newX = event.values[SensorManager.DATA_X];
+			newY = event.values[SensorManager.DATA_Y];
+			newZ = event.values[SensorManager.DATA_Z];
 			
-			if(SettingString.mIsDebug) Log.d(mTag, "x:" + newX + " y:" + newY + " z:" + newZ);
+//			if(SettingString.mIsDebug) Log.d(mTag, "x:" + newX + " y:" + newY + " z:" + newZ);
 		}
 	}
 
@@ -54,7 +66,7 @@ public class OriItem extends ExpItemBase implements SensorEventListener {
 		mSensorManager = (SensorManager)mService.getSystemService(Context.SENSOR_SERVICE);
 		mOrientation = mSensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION);
         
-        mSensorManager.registerListener(this, mOrientation, TimeLimit * 1000 * 1000);
+        mSensorManager.registerListener(this, mOrientation, SensorManager.SENSOR_DELAY_UI);
         
 		return super.onStart(context);
 	}
@@ -73,5 +85,29 @@ public class OriItem extends ExpItemBase implements SensorEventListener {
 		return true;
 	}
 
-	
+	@Override
+	public void receiveIntervalEvent(Context c, Intent i) {
+		// TODO Auto-generated method stub
+		
+		if(SettingString.mIsDebug) Log.d(mTag, "ox:" + newX + " oy:" + newY + " oz:" + newZ);
+		
+		List<ExpItemBase.RecordPair> pairList = new ArrayList<ExpItemBase.RecordPair>();
+		ExpItemBase.RecordPair xyzPair = new ExpItemBase.RecordPair();
+		
+		xyzPair.key = ORIENTATION_X;
+		xyzPair.value = String.valueOf(newX);
+		pairList.add(xyzPair);
+
+		xyzPair.key = ORIENTATION_Y;
+		xyzPair.value = String.valueOf(newY);
+		pairList.add(xyzPair);
+
+		xyzPair.key = ORIENTATION_Z;
+		xyzPair.value = String.valueOf(newZ);
+		pairList.add(xyzPair);
+		
+		insertRecord(c, pairList);
+		
+		super.receiveIntervalEvent(c, i);
+	}
 }

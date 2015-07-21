@@ -1,7 +1,11 @@
 package com.example.pipa.item;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.app.Service;
 import android.content.Context;
+import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -17,13 +21,21 @@ public class MagnItem extends ExpItemBase implements SensorEventListener {
 	private SensorManager mSensorManager;
     private Sensor mMagnetic;
 
+    private String MAGNETIC_X = "mx";
+    private String MAGNETIC_Y = "my";
+    private String MAGNETIC_Z = "mz";
+    
+    float newX;
+	float newY;
+	float newZ;
+	
 //	public final String ALERT_STRING = "加速度感測器";
 
 	public MagnItem(Service service) {
 		// TODO Auto-generated constructor stub
 
 		super(service);
-		mExpPrefix = "Ori";
+		mExpPrefix = "Magn";
 		
 	}
 
@@ -39,11 +51,10 @@ public class MagnItem extends ExpItemBase implements SensorEventListener {
 		// TODO Auto-generated method stub
 		if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
 
-			float newX = event.values[SensorManager.DATA_X];
-			float newY = event.values[SensorManager.DATA_Y];
-			float newZ = event.values[SensorManager.DATA_Z];
+			newX = event.values[SensorManager.DATA_X];
+			newY = event.values[SensorManager.DATA_Y];
+			newZ = event.values[SensorManager.DATA_Z];
 			
-			if(SettingString.mIsDebug) Log.d(mTag, "x:" + newX + " y:" + newY + " z:" + newZ);
 		}
 	}
 
@@ -53,7 +64,7 @@ public class MagnItem extends ExpItemBase implements SensorEventListener {
 		mSensorManager = (SensorManager)mService.getSystemService(Context.SENSOR_SERVICE);
 		mMagnetic = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
         
-        mSensorManager.registerListener(this, mMagnetic, TimeLimit * 1000 * 1000);
+        mSensorManager.registerListener(this, mMagnetic, SensorManager.SENSOR_DELAY_UI);
         
 		return super.onStart(context);
 	}
@@ -72,5 +83,29 @@ public class MagnItem extends ExpItemBase implements SensorEventListener {
 		return true;
 	}
 
-	
+	@Override
+	public void receiveIntervalEvent(Context c, Intent i) {
+		// TODO Auto-generated method stub
+		
+		if(SettingString.mIsDebug) Log.d(mTag, "mx:" + newX + " my:" + newY + " mz:" + newZ);
+		
+		List<ExpItemBase.RecordPair> pairList = new ArrayList<ExpItemBase.RecordPair>();
+		ExpItemBase.RecordPair xyzPair = new ExpItemBase.RecordPair();
+		
+		xyzPair.key = MAGNETIC_X;
+		xyzPair.value = String.valueOf(newX);
+		pairList.add(xyzPair);
+
+		xyzPair.key = MAGNETIC_Y;
+		xyzPair.value = String.valueOf(newY);
+		pairList.add(xyzPair);
+
+		xyzPair.key = MAGNETIC_Z;
+		xyzPair.value = String.valueOf(newZ);
+		pairList.add(xyzPair);
+		
+		insertRecord(c, pairList);
+		
+		super.receiveIntervalEvent(c, i);
+	}
 }

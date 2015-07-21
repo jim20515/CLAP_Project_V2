@@ -8,6 +8,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
@@ -55,11 +56,12 @@ public class MainActivity extends Activity implements AsyncResponse {
 //	private String mDevice;
 	private String mUUID;
 
+	@SuppressLint("SimpleDateFormat")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-
+		
 		// 取得使用者手機型號和OS版本
 //		mDeviceOs = android.os.Build.VERSION.RELEASE;
 //		mDevice = android.os.Build.MODEL.replace(' ', '-');

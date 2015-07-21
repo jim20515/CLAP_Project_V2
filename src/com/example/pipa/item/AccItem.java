@@ -1,5 +1,8 @@
 package com.example.pipa.item;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -92,10 +95,24 @@ public class AccItem extends ExpItemBase implements SensorEventListener {
 	public void receiveIntervalEvent(Context c, Intent i) {
 		// TODO Auto-generated method stub
 		
-		if(SettingString.mIsDebug) Log.d(mTag, "x:" + newX + " y:" + newY + " z:" + newZ);
-		insertRecord(c, ACCELEROMETER_X, newX);
-		insertRecord(c, ACCELEROMETER_Y, newY);
-		insertRecord(c, ACCELEROMETER_Z, newZ);
+		if(SettingString.mIsDebug) Log.d(mTag, "ax:" + newX + " ay:" + newY + " az:" + newZ);
+		
+		List<ExpItemBase.RecordPair> pairList = new ArrayList<ExpItemBase.RecordPair>();
+		ExpItemBase.RecordPair xyzPair = new ExpItemBase.RecordPair();
+		
+		xyzPair.key = ACCELEROMETER_X;
+		xyzPair.value = String.valueOf(newX);
+		pairList.add(xyzPair);
+
+		xyzPair.key = ACCELEROMETER_Y;
+		xyzPair.value = String.valueOf(newY);
+		pairList.add(xyzPair);
+
+		xyzPair.key = ACCELEROMETER_Z;
+		xyzPair.value = String.valueOf(newZ);
+		pairList.add(xyzPair);
+		
+		insertRecord(c, pairList);
 		
 		super.receiveIntervalEvent(c, i);
 	}

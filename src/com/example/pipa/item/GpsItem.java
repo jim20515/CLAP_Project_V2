@@ -1,8 +1,10 @@
 package com.example.pipa.item;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.app.Service;
 import android.content.Context;
-import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -19,8 +21,7 @@ public class GpsItem extends ExpItemBase implements LocationListener {
 
 	private Context mContext;
 	private LocationManager lms;
-	private String bestProvider = LocationManager.GPS_PROVIDER;	//最佳資訊提供者
-	private final int DURATION_SECOND = 1;
+	private final long DURATION_SECOND = TWENTY_SECONDS;
 	
 	private final String LONGITUDE = "longitude";
 	private final String LATITUDE = "latitude";
@@ -29,12 +30,12 @@ public class GpsItem extends ExpItemBase implements LocationListener {
 	private final String BEARING = "bearing";
 	private final String ALTITUDE = "altitude";
 	
-	private final String PREF_LONGITUDE = LONGITUDE;
-	private final String PREF_LATITUDE = LATITUDE;
-	private final String PREF_ACCURACY = ACCURACY;
-	private final String PREF_SPEED = SPEED;
-	private final String PREF_BEARING = BEARING;
-	private final String PREF_ALTITUDE = ALTITUDE;
+//	private final String PREF_LONGITUDE = LONGITUDE;
+//	private final String PREF_LATITUDE = LATITUDE;
+//	private final String PREF_ACCURACY = ACCURACY;
+//	private final String PREF_SPEED = SPEED;
+//	private final String PREF_BEARING = BEARING;
+//	private final String PREF_ALTITUDE = ALTITUDE;
 
 	public final String ALERT_STRING = "GPS資訊";
 
@@ -73,11 +74,12 @@ public class GpsItem extends ExpItemBase implements LocationListener {
 
 	private void locationServiceInitial(Context context) {
 		lms = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);	//取得系統定位服務
-		Criteria criteria = new Criteria();	//資訊提供者選取標準
-		bestProvider = lms.getBestProvider(criteria, true);	//選擇精準度最高的提供者
+//		Criteria criteria = new Criteria();	//資訊提供者選取標準
+//		bestProvider = lms.getBestProvider(criteria, true);	//選擇精準度最高的提供者
 
 		//服務提供者、更新頻率60000毫秒=1分鐘、最短距離、地點改變時呼叫物件
-		lms.requestLocationUpdates(bestProvider, DURATION_SECOND * 1000, 1, this);
+//		lms.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, DURATION_SECOND, 1, this);
+		lms.requestLocationUpdates(LocationManager.GPS_PROVIDER, DURATION_SECOND, 1, this);
 	}
 	
 	@Override
@@ -95,23 +97,57 @@ public class GpsItem extends ExpItemBase implements LocationListener {
 		//當地點改變時
 		// TODO Auto-generated method stub
 
-		if(mExpRealAttributes.contains(PREF_LONGITUDE))
-			insertRecord(mContext, LONGITUDE, arg0.getLongitude());
+		List<ExpItemBase.RecordPair> pairList = new ArrayList<ExpItemBase.RecordPair>();
 		
-		if(mExpRealAttributes.contains(PREF_LATITUDE))
-			insertRecord(mContext, LATITUDE, arg0.getLatitude());
+		ExpItemBase.RecordPair pair = new ExpItemBase.RecordPair();
+		pair.key = LONGITUDE;
+		pair.value = String.valueOf(arg0.getLongitude());
+		pairList.add(pair);
 		
-		if(mExpRealAttributes.contains(PREF_ACCURACY))
-			insertRecord(mContext, ACCURACY, arg0.getAccuracy());
+		pair = new ExpItemBase.RecordPair();
+		pair.key = LATITUDE;
+		pair.value = String.valueOf(arg0.getLatitude());
+		pairList.add(pair);
 		
-		if(mExpRealAttributes.contains(PREF_SPEED))
-			insertRecord(mContext, SPEED, arg0.getSpeed());
+		pair = new ExpItemBase.RecordPair();
+		pair.key = ACCURACY;
+		pair.value = String.valueOf(arg0.getAccuracy());
+		pairList.add(pair);
 		
-		if(mExpRealAttributes.contains(PREF_BEARING))
-			insertRecord(mContext, BEARING, arg0.getBearing());
+		pair = new ExpItemBase.RecordPair();
+		pair.key = SPEED;
+		pair.value = String.valueOf(arg0.getSpeed());
+		pairList.add(pair);
 		
-		if(mExpRealAttributes.contains(PREF_ALTITUDE))
-			insertRecord(mContext, ALTITUDE, arg0.getAltitude());
+		pair = new ExpItemBase.RecordPair();
+		pair.key = BEARING;
+		pair.value = String.valueOf(arg0.getBearing());
+		pairList.add(pair);
+		
+		pair = new ExpItemBase.RecordPair();
+		pair.key = ALTITUDE;
+		pair.value = String.valueOf(arg0.getAltitude());
+		pairList.add(pair);
+		
+		insertRecord(mContext, pairList);
+		
+//		if(mExpRealAttributes.contains(PREF_LONGITUDE))
+//			insertRecord(mContext, LONGITUDE, arg0.getLongitude());
+		
+//		if(mExpRealAttributes.contains(PREF_LATITUDE))
+//			insertRecord(mContext, LATITUDE, arg0.getLatitude());
+		
+//		if(mExpRealAttributes.contains(PREF_ACCURACY))
+//			insertRecord(mContext, ACCURACY, arg0.getAccuracy());
+		
+//		if(mExpRealAttributes.contains(PREF_SPEED))
+//			insertRecord(mContext, SPEED, arg0.getSpeed());
+		
+//		if(mExpRealAttributes.contains(PREF_BEARING))
+//			insertRecord(mContext, BEARING, arg0.getBearing());
+		
+//		if(mExpRealAttributes.contains(PREF_ALTITUDE))
+//			insertRecord(mContext, ALTITUDE, arg0.getAltitude());
 		
 		if(SettingString.mIsDebug) Log.d(mTag, DateTimeHelper.getNowFormat() + " Location Lat:" + arg0.getLatitude() + " Long:" + arg0.getLongitude());
 	}

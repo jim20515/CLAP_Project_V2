@@ -2,6 +2,7 @@ package com.example.pipa.item;
 
 import android.app.Service;
 import android.content.Context;
+import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -10,22 +11,25 @@ import android.util.Log;
 
 import com.example.plpa.utils.SettingString;
 
-public class TempItem extends ExpItemBase implements SensorEventListener {
+public class LiItem extends ExpItemBase implements SensorEventListener {
 
 	private final String mTag = SettingString.TAG;
 
 	private SensorManager mSensorManager;
-    private Sensor mTemperature;
+    private Sensor mLight;
 
-	private final String TEMPERATURE_X = "temp";
+	private final String LIGHT = "li";
+	
+	float preLi = 0;
+	float li;
 	
 //	public final String ALERT_STRING = "加速度感測器";
 
-	public TempItem(Service service) {
+	public LiItem(Service service) {
 		// TODO Auto-generated constructor stub
 
 		super(service);
-		mExpPrefix = "Temp";
+		mExpPrefix = "Li";
 		
 	}
 
@@ -35,28 +39,23 @@ public class TempItem extends ExpItemBase implements SensorEventListener {
 
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public void onSensorChanged(SensorEvent event) {
 		// TODO Auto-generated method stub
-		if (event.sensor.getType() == Sensor.TYPE_TEMPERATURE) {
+		if (event.sensor.getType() == Sensor.TYPE_LIGHT) {
 
-			float temp = event.values[0];
+			li = event.values[0];
 			
-			insertRecord(mService, TEMPERATURE_X, temp);
-			
-			if(SettingString.mIsDebug) Log.d(mTag, "Temp:" + temp);
 		}
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public boolean onStart(Context context) {
 		// TODO Auto-generated method stub
 		mSensorManager = (SensorManager)mService.getSystemService(Context.SENSOR_SERVICE);
-		mTemperature = mSensorManager.getDefaultSensor(Sensor.TYPE_TEMPERATURE);
+		mLight = mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
         
-        mSensorManager.registerListener(this, mTemperature, SensorManager.SENSOR_DELAY_UI);
+        mSensorManager.registerListener(this, mLight, SensorManager.SENSOR_DELAY_UI);
         
 		return super.onStart(context);
 	}
@@ -72,8 +71,21 @@ public class TempItem extends ExpItemBase implements SensorEventListener {
 	@Override
 	public boolean needTimeLimit() {
 		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
-	
+	@Override
+	public void receiveIntervalEvent(Context c, Intent i) {
+		// TODO Auto-generated method stub
+		
+		if(li != preLi) {
+			insertRecord(mService, LIGHT, li);
+			
+			if(SettingString.mIsDebug) Log.d(mTag, "Light:" + li);
+		}
+		
+		preLi = li;
+		
+		super.receiveIntervalEvent(c, i);
+	}
 }

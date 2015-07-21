@@ -41,8 +41,6 @@ public class DBHelper extends SQLiteOpenHelper {
 				+ DATETIME + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP);";
 		db.execSQL(INIT_TABLE);
 
-		Log.v(mTag, INIT_TABLE);
-
 	}
 
 	public void truncateDB(SQLiteDatabase db) {

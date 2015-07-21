@@ -1,7 +1,10 @@
 package com.example.pipa.item;
 
-import java.util.ArrayList;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
 
+import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -13,27 +16,31 @@ import android.os.SystemClock;
 
 import com.example.plpa.utils.DBHelper;
 import com.example.plpa.utils.DbConstants;
-import com.example.plpa.utils.ExpApplyJson;
 
 public abstract class ExpItemBase {
 	
 	public Service mService;
 	private DBHelper mHelper;
 	public String mExpPrefix;
-	public ArrayList<ExpApplyJson.Item> mExpRealAttributes;
-	public final int TimeLimit = 30;
+//	public ArrayList<ExpApplyJson.Item> mExpRealAttributes;
+//	public final int TimeLimit = 30;
 
 	public PendingIntent pi;
     public BroadcastReceiver br;
     public AlarmManager am;
     
     public static long ONE_SECOND = 1000;
-    public static long TWENTY_SECONDS = ONE_SECOND * 5;
+    public static long TWENTY_SECONDS = ONE_SECOND * 20;
     
 //	public boolean needTimeLimit;
 	
+    public class RecordPair {
+    	public String key;
+    	public String value;
+    }
+    
 	public ExpItemBase(Service service){
-		mExpRealAttributes = new ArrayList<ExpApplyJson.Item>();
+//		mExpRealAttributes = new ArrayList<ExpApplyJson.Item>();
 		
 		mService = service;
 
@@ -85,8 +92,20 @@ public abstract class ExpItemBase {
 		insertRecord(context, attr, value, null);
 	}
 	
-	public void insertRecord(Context context, String attr, double value, String dateTime) {
-		insertRecord(context, attr, String.valueOf(value), dateTime);
+//	private void insertRecord(Context context, String attr, double value, String dateTime) {
+//		insertRecord(context, attr, String.valueOf(value), dateTime);
+//	}
+	
+	@SuppressLint("SimpleDateFormat")
+	public void insertRecord(Context context, List<RecordPair> pairs) {
+
+		SimpleDateFormat s = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+		String format = s.format(new Date());
+		
+		for(RecordPair pair : pairs){
+			insertRecord(context, pair.key, pair.value, format);
+		}
+		
 	}
 	
 	public void insertRecord(Context context, String attr, String value, String dateTime) {

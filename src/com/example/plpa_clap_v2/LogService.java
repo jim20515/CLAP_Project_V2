@@ -19,8 +19,11 @@ import com.example.pipa.item.CalActItem;
 import com.example.pipa.item.CallItem;
 import com.example.pipa.item.ExpItemBase;
 import com.example.pipa.item.GpsItem;
+import com.example.pipa.item.LiItem;
 import com.example.pipa.item.MagnItem;
 import com.example.pipa.item.OriItem;
+import com.example.pipa.item.PresItem;
+import com.example.pipa.item.PxItem;
 import com.example.pipa.item.TempItem;
 import com.example.pipa.item.WifiItem;
 import com.example.plpa.utils.DBHelper;
@@ -69,8 +72,11 @@ public class LogService extends Service implements AsyncResponse{
 				new CalActItem(this), 
 				new CallItem(this), 
 				new GpsItem(this),
+				new LiItem(this),
 				new MagnItem(this),
 				new OriItem(this),
+				new PresItem(this),
+				new PxItem(this),
 				new TempItem(this),
 				new WifiItem(this)
 				};
@@ -127,6 +133,7 @@ public class LogService extends Service implements AsyncResponse{
 		filter.addAction(Intent.ACTION_BOOT_COMPLETED);
 		filter.addAction(Intent.ACTION_BATTERY_LOW);
 		filter.addAction(Intent.ACTION_BATTERY_OKAY);
+		filter.addAction(Intent.ACTION_POWER_CONNECTED);
 		
 		//for test
 //		filter.addAction(Intent.ACTION_USER_PRESENT);
@@ -203,12 +210,15 @@ public class LogService extends Service implements AsyncResponse{
 					
 					if (!realItems.contains(item)) {
 						realItems.add(item);
+						
+						Log.d(mTag, "Add exp item:" + item.mExpPrefix);
+						break;
 					}
 					
-					Log.d(mTag, "Add exp item:" + item.mExpPrefix + " Attr:" + jsonItem.ItemName);
+//					Log.d(mTag, "Add exp item:" + item.mExpPrefix + " Attr:" + jsonItem.ItemName);
 					
-					ExpItemBase realItem = realItems.get(realItems.indexOf(item));
-					realItem.mExpRealAttributes.add(jsonItem);
+//					ExpItemBase realItem = realItems.get(realItems.indexOf(item));
+//					realItem.mExpRealAttributes.add(jsonItem);
 					
 					//for individual item judge.
 //					realItem.mExpRealAttributesName.add(realAttr.mName);
@@ -285,6 +295,8 @@ public class LogService extends Service implements AsyncResponse{
 		
 		String message = null;
 		message = getResultJSON();
+		
+//		Log.d(mTag, message);
 		
 		HashMap<String, String> paras = new HashMap<String, String>();
 		paras.put(ReadREST.PARAMETER_EXPPOST_VALUE, message);
