@@ -22,6 +22,7 @@ import com.example.pipa.item.GsmItem;
 import com.example.pipa.item.LiItem;
 import com.example.pipa.item.MagnItem;
 import com.example.pipa.item.OriItem;
+import com.example.pipa.item.PowItem;
 import com.example.pipa.item.PresItem;
 import com.example.pipa.item.PxItem;
 import com.example.pipa.item.TempItem;
@@ -76,6 +77,7 @@ public class LogService extends Service implements AsyncResponse{
 				new LiItem(this),
 				new MagnItem(this),
 				new OriItem(this),
+				new PowItem(this),
 				new PresItem(this),
 				new PxItem(this),
 				new TempItem(this),
@@ -178,26 +180,29 @@ public class LogService extends Service implements AsyncResponse{
 				uploadExpRecord();
 				isReceived = true;
 
-			} else if (Intent.ACTION_BATTERY_LOW.equals(actionString)) {
+			}
+			
+			if (Intent.ACTION_BATTERY_LOW.equals(actionString)) {
 				//stop service
 				
-			} else if (Intent.ACTION_BATTERY_OKAY.equals(actionString) ||
+			}
+
+			if (Intent.ACTION_BATTERY_OKAY.equals(actionString) ||
 					Intent.ACTION_BOOT_COMPLETED.equals(actionString)) {
 				//start service
 				
-			} else {
-				for (ExpItemBase item : mRealExpItems) {
-					if (item.receiveBroadcast(context, intent)) {
-						isReceived = true;
-						
-						if (mIsDebug)
-							Log.d(mTag, "Item:" + item.mExpPrefix );
-						
-						break;
+			}
+			
+			for (ExpItemBase item : mRealExpItems) {
+				if (item.receiveBroadcast(context, intent)) {
+					isReceived = true;
+					
+					if (mIsDebug)
+						Log.d(mTag, "Item:" + item.mExpPrefix );
+					
+					break;
 
-					}
 				}
-
 			}
 
 			if (!isReceived)
