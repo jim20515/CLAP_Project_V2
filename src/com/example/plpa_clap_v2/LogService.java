@@ -95,13 +95,15 @@ public class LogService extends Service implements AsyncResponse{
 		// TODO Auto-generated method stub
 		super.onStartCommand(intent, flags, startId);
 		
-		return START_NOT_STICKY;
+		return START_STICKY;
 	}
 
 	@Override
 	public void onDestroy() {
 		// TODO Auto-generated method stub
 		super.onDestroy();
+		
+		Log.d(mTag, "onDestroy");
 		
 		this.unregisterReceiver(mEventReceiver);
 		
