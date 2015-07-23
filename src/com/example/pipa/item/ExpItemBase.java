@@ -76,6 +76,10 @@ public abstract class ExpItemBase {
 		try {
 			if(br != null)
 				mService.unregisterReceiver(br);
+			
+			if(pi != null)
+				am.cancel(pi);
+			
 		} catch (Exception e){
 			
 		}

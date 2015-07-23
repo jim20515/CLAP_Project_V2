@@ -71,7 +71,6 @@ public class WifiItem extends ExpItemBase {
 		return filter;
 	}
 
-//	@SuppressWarnings({ "static-access"})
 	@Override
 	public boolean receiveBroadcast(Context context, Intent intent) {
 		// TODO Auto-generated method stub

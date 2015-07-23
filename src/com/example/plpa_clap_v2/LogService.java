@@ -12,13 +12,13 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.IBinder;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.example.pipa.item.AccItem;
 import com.example.pipa.item.CalActItem;
 import com.example.pipa.item.CallItem;
 import com.example.pipa.item.ExpItemBase;
 import com.example.pipa.item.GpsItem;
+import com.example.pipa.item.GsmItem;
 import com.example.pipa.item.LiItem;
 import com.example.pipa.item.MagnItem;
 import com.example.pipa.item.OriItem;
@@ -72,6 +72,7 @@ public class LogService extends Service implements AsyncResponse{
 				new CalActItem(this), 
 				new CallItem(this), 
 				new GpsItem(this),
+				new GsmItem(this),
 				new LiItem(this),
 				new MagnItem(this),
 				new OriItem(this),
@@ -188,6 +189,10 @@ public class LogService extends Service implements AsyncResponse{
 				for (ExpItemBase item : mRealExpItems) {
 					if (item.receiveBroadcast(context, intent)) {
 						isReceived = true;
+						
+						if (mIsDebug)
+							Log.d(mTag, "Item:" + item.mExpPrefix );
+						
 						break;
 
 					}

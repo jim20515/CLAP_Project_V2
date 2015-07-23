@@ -79,9 +79,6 @@ public class AccItem extends ExpItemBase implements SensorEventListener {
 		// TODO Auto-generated method stub
 		mSensorManager.unregisterListener(this);
 		
-		am.cancel(pi);
-		mService.unregisterReceiver(br);
-		
 		super.onDestroy();
 	}
 
@@ -97,8 +94,8 @@ public class AccItem extends ExpItemBase implements SensorEventListener {
 		
 		if(SettingString.mIsDebug) Log.d(mTag, "ax:" + newX + " ay:" + newY + " az:" + newZ);
 		
-		List<ExpItemBase.RecordPair> pairList = new ArrayList<ExpItemBase.RecordPair>();
-		ExpItemBase.RecordPair xyzPair = new ExpItemBase.RecordPair();
+		List<RecordPair> pairList = new ArrayList<RecordPair>();
+		RecordPair xyzPair = new RecordPair();
 		
 		xyzPair.key = ACCELEROMETER_X;
 		xyzPair.value = String.valueOf(newX);
