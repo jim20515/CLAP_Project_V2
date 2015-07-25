@@ -26,6 +26,7 @@ import com.example.pipa.item.OriItem;
 import com.example.pipa.item.PowItem;
 import com.example.pipa.item.PresItem;
 import com.example.pipa.item.PxItem;
+import com.example.pipa.item.ScreenItem;
 import com.example.pipa.item.TempItem;
 import com.example.pipa.item.WifiItem;
 import com.example.plpa.utils.DBHelper;
@@ -82,6 +83,7 @@ public class LogService extends Service implements AsyncResponse{
 				new PowItem(this),
 				new PresItem(this),
 				new PxItem(this),
+				new ScreenItem(this),
 				new TempItem(this),
 				new WifiItem(this)
 				};

@@ -112,6 +112,7 @@ public abstract class ExpItemBase {
 		
 	}
 	
+	@SuppressLint("SimpleDateFormat")
 	public void insertRecord(Context context, String attr, String value, String dateTime) {
 		DbConstants dbItem = new DbConstants();
 
@@ -119,8 +120,13 @@ public abstract class ExpItemBase {
 		dbItem.setItem(mExpPrefix);
 		dbItem.setAttr(attr);
 		dbItem.setAttrval(value);
-		if(dateTime != null) dbItem.setDateTime(dateTime);
 		
+		if (dateTime == null) {
+			SimpleDateFormat s = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+			dateTime = s.format(new Date());
+		}
+		
+		dbItem.setDateTime(dateTime);
 		mHelper.addRecord(dbItem);
 		
 	}
