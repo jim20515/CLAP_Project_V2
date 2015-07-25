@@ -7,14 +7,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.net.NetworkInfo;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
 import android.os.BatteryManager;
-import android.os.PowerManager;
-import android.telephony.PhoneStateListener;
-import android.telephony.SignalStrength;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import com.example.plpa.utils.SettingString;
@@ -22,8 +15,6 @@ import com.example.plpa.utils.SettingString;
 public class PowItem extends ExpItemBase {
 
 	private final String mTag = SettingString.TAG;
-
-	TelephonyManager mTeleManager;
 
 	private final String ATTRI_POWACT = "powact";
 	private final String ATTRI_POWVAL = "powval";
