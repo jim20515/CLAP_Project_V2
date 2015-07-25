@@ -39,6 +39,10 @@ public abstract class ExpItemBase {
     	public String value;
     }
     
+    public class RecordPairWithTime extends RecordPair{
+    	public String dateTime;
+    }
+    
 	public ExpItemBase(Service service){
 //		mExpRealAttributes = new ArrayList<ExpApplyJson.Item>();
 		
@@ -110,6 +114,13 @@ public abstract class ExpItemBase {
 			insertRecord(context, pair.key, pair.value, format);
 		}
 		
+	}
+	
+	public void insertRecordWithTime(Context context, List<RecordPairWithTime> pairs) {
+		
+		for(RecordPairWithTime pair : pairs){
+			insertRecord(context, pair.key, pair.value, pair.dateTime);
+		}
 	}
 	
 	@SuppressLint("SimpleDateFormat")

@@ -14,6 +14,7 @@ import android.os.IBinder;
 import android.util.Log;
 
 import com.example.pipa.item.AccItem;
+import com.example.pipa.item.BrowserItem;
 import com.example.pipa.item.CalActItem;
 import com.example.pipa.item.CallItem;
 import com.example.pipa.item.ExpItemBase;
@@ -72,6 +73,7 @@ public class LogService extends Service implements AsyncResponse{
 		mAllExpItems = new ExpItemBase[] { 
 
 				new AccItem(this),
+				new BrowserItem(this),
 				new CalActItem(this), 
 				new CallItem(this),
 				new ExtmediaItem(this),
