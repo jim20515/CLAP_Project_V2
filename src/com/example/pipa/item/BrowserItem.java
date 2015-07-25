@@ -37,17 +37,6 @@ public class BrowserItem extends ExpItemBase {
 
 	}
 
-	
-	@Override
-	public boolean onStart(Context context) {
-		// TODO Auto-generated method stub
-		
-		
-		
-		return super.onStart(context);
-	}
-
-
 	@Override
 	public boolean needTimeLimit() {
 		// TODO Auto-generated method stub
