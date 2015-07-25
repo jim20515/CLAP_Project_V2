@@ -24,6 +24,7 @@ import com.example.pipa.item.GsmItem;
 import com.example.pipa.item.LiItem;
 import com.example.pipa.item.MagnItem;
 import com.example.pipa.item.OriItem;
+import com.example.pipa.item.PkgItem;
 import com.example.pipa.item.PowItem;
 import com.example.pipa.item.PresItem;
 import com.example.pipa.item.PxItem;
@@ -83,6 +84,7 @@ public class LogService extends Service implements AsyncResponse{
 				new LiItem(this),
 				new MagnItem(this),
 				new OriItem(this),
+				new PkgItem(this),
 				new PowItem(this),
 				new PresItem(this),
 				new PxItem(this),
