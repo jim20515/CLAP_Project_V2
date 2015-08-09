@@ -23,6 +23,7 @@ import com.example.pipa.item.GpsItem;
 import com.example.pipa.item.GsmItem;
 import com.example.pipa.item.LiItem;
 import com.example.pipa.item.MagnItem;
+import com.example.pipa.item.RingerItem;
 import com.example.pipa.item.OriItem;
 import com.example.pipa.item.PkgItem;
 import com.example.pipa.item.PowItem;
@@ -75,6 +76,7 @@ public class LogService extends Service implements AsyncResponse{
 		mAllExpItems = new ExpItemBase[] { 
 
 				new AccItem(this),
+				new RingerItem(this),
 				new BrowserItem(this),
 				new CalActItem(this), 
 				new CallItem(this),

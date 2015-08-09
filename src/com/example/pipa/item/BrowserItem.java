@@ -8,14 +8,10 @@ import java.util.List;
 import android.annotation.SuppressLint;
 import android.app.Service;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.database.Cursor;
 import android.provider.Browser;
-import android.provider.CallLog;
 import android.util.Log;
 
-import com.example.plpa.utils.DateTimeHelper;
 import com.example.plpa.utils.PreferenceHelper;
 import com.example.plpa.utils.SettingString;
 
