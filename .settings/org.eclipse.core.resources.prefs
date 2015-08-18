@@ -1,5 +1,6 @@
 eclipse.preferences.version=1
 encoding//src/com/example/pipa/item/AccItem.java=UTF-8
+encoding//src/com/example/pipa/item/BTItem.java=UTF-8
 encoding//src/com/example/pipa/item/BrowserItem.java=UTF-8
 encoding//src/com/example/pipa/item/CalActItem.java=UTF-8
 encoding//src/com/example/pipa/item/CallItem.java=UTF-8
@@ -17,5 +18,6 @@ encoding//src/com/example/pipa/item/RingerItem.java=UTF-8
 encoding//src/com/example/pipa/item/ScreenItem.java=UTF-8
 encoding//src/com/example/pipa/item/SmsItem.java=UTF-8
 encoding//src/com/example/pipa/item/TempItem.java=UTF-8
+encoding//src/com/example/pipa/item/TrafficItem.java=UTF-8
 encoding//src/com/example/pipa/item/WifiItem.java=UTF-8
 encoding/<project>=UTF-8

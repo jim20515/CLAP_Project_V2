@@ -1,5 +1,6 @@
 package com.example.plpa.utils;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 
@@ -12,6 +13,7 @@ public class PreferenceHelper {
 //	public static final String PREF_DESCRIPTION = "Description";
 	public static final String PREF_EXPAPPLY = "pref_expapply";
 	
+	@SuppressLint("SdCardPath")
 	public static final String XML_PATH = "/data/data/com.example.plpa_clap_v2/shared_prefs/" + PREF_FILENAME + ".xml";
 
 	public static final String ID_CHECK = "checkid"; // ����ID�Ѽ�XML�ɦW

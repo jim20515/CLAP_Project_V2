@@ -14,6 +14,7 @@ import android.os.IBinder;
 import android.util.Log;
 
 import com.example.pipa.item.AccItem;
+import com.example.pipa.item.BTItem;
 import com.example.pipa.item.BrowserItem;
 import com.example.pipa.item.CalActItem;
 import com.example.pipa.item.CallItem;
@@ -32,6 +33,7 @@ import com.example.pipa.item.PxItem;
 import com.example.pipa.item.ScreenItem;
 import com.example.pipa.item.SmsItem;
 import com.example.pipa.item.TempItem;
+import com.example.pipa.item.TrafficItem;
 import com.example.pipa.item.WifiItem;
 import com.example.plpa.utils.DBHelper;
 import com.example.plpa.utils.DbConstants;
@@ -78,6 +80,7 @@ public class LogService extends Service implements AsyncResponse{
 				new AccItem(this),
 				new RingerItem(this),
 				new BrowserItem(this),
+				new BTItem(this),
 				new CalActItem(this), 
 				new CallItem(this),
 				new ExtmediaItem(this),
@@ -93,6 +96,7 @@ public class LogService extends Service implements AsyncResponse{
 				new ScreenItem(this),
 				new SmsItem(this),
 				new TempItem(this),
+				new TrafficItem(this),
 				new WifiItem(this)
 				};
 		

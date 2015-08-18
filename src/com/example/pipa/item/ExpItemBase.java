@@ -30,7 +30,7 @@ public abstract class ExpItemBase {
     public AlarmManager am;
     
     public static long ONE_SECOND = 1000;
-    public static long TWENTY_SECONDS = ONE_SECOND * 20;
+    public static long DEFAULT_ALARM_TIME = ONE_SECOND * 20;
     
 //	public boolean needTimeLimit;
 	
@@ -71,7 +71,7 @@ public abstract class ExpItemBase {
 	        am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 	        pi = PendingIntent.getBroadcast(context, 0, dialogIntent,PendingIntent.FLAG_CANCEL_CURRENT);
 
-	        am.setRepeating(AlarmManager.RTC_WAKEUP, SystemClock.elapsedRealtime(), TWENTY_SECONDS, pi);
+	        am.setRepeating(AlarmManager.RTC_WAKEUP, SystemClock.elapsedRealtime(), DEFAULT_ALARM_TIME, pi);
 		}
 		return true;
 	}
@@ -116,6 +116,18 @@ public abstract class ExpItemBase {
 		
 	}
 	
+//	@SuppressLint("SimpleDateFormat")
+//	public void insertOrUpdateRecord(Context context, List<RecordPair> pairs) {
+//
+//		SimpleDateFormat s = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+//		String format = s.format(new Date());
+//		
+//		for(RecordPair pair : pairs){
+//			insertRecord(context, pair.key, pair.value, format, false);
+//		}
+//		
+//	}
+	
 	public void insertRecordWithTime(Context context, List<RecordPairWithTime> pairs) {
 		
 		for(RecordPairWithTime pair : pairs){
@@ -138,8 +150,10 @@ public abstract class ExpItemBase {
 		}
 		
 		dbItem.setDateTime(dateTime);
-		mHelper.addRecord(dbItem);
-		
+//		if(!checkUpdate)
+			mHelper.addRecord(dbItem);
+//		else
+//			mHelper.AddOrUpdateRecord(dbItem);
 	}
 	
 //	private List<DbConstants> countConstantsBetween(DbConstants preConstants, 

@@ -21,7 +21,7 @@ public class GpsItem extends ExpItemBase implements LocationListener {
 
 	private Context mContext;
 	private LocationManager lms;
-	private final long DURATION_SECOND = TWENTY_SECONDS;
+	private final long DURATION_SECOND = DEFAULT_ALARM_TIME;
 	
 	private final String LONGITUDE = "longitude";
 	private final String LATITUDE = "latitude";

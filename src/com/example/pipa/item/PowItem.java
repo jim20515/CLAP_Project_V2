@@ -64,6 +64,7 @@ public class PowItem extends ExpItemBase {
 				Intent.ACTION_BATTERY_OKAY.equals(action)) {
 
 			String statusString = "";
+
 			if (Intent.ACTION_POWER_CONNECTED.equals(action))
 				statusString = "插電中";
 			else if (Intent.ACTION_POWER_DISCONNECTED.equals(action))

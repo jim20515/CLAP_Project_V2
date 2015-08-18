@@ -18,7 +18,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
-import android.util.Log;
 
 public class DBHelper extends SQLiteOpenHelper {
 
@@ -26,7 +25,6 @@ public class DBHelper extends SQLiteOpenHelper {
 	private static final String TABLE_NAME = "clap";
 	
 	private final static int DATABASE_VERSION = 1;
-	private static final String mTag = SettingString.TAG;
 
 	public DBHelper(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -80,6 +78,29 @@ public class DBHelper extends SQLiteOpenHelper {
         db.close(); // Closing database connection
     }
     
+    //修改記錄，回傳成功修改筆數
+//  	public void AddOrUpdateRecord(DbConstants record) {
+//  		SQLiteDatabase db = this.getWritableDatabase();
+//  		
+//  		if(getRecordCount() == 0) {
+//  			addRecord(record);
+//  			return;
+//  		}
+//  			
+//  		ContentValues values = new ContentValues();
+//        values.put(ITEM, record.getItem()); 
+//        values.put(ATTR, record.getAttr());
+//        values.put(ATTRVAL, record.getAttrval());
+//        if(record.getDateTime() != null) values.put(DATETIME, record.getDateTime());
+//   
+//  		db.update(TABLE_NAME,	//資料表名稱
+//  				values,				//VALUE
+//  		"_ID=" + record.getId(),			//WHERE
+//  		null				//WHERE的參數
+//  		);
+//  		db.close();
+//  	}
+    
     public int getRecordCount() {
         String countQuery = "SELECT  * FROM " + TABLE_NAME;
         SQLiteDatabase db = this.getReadableDatabase();
@@ -91,6 +112,22 @@ public class DBHelper extends SQLiteOpenHelper {
         // return count
         return count;
     }
+    
+    public int getRecordCount(int rowId) {
+        String countQuery = "SELECT  * FROM " + TABLE_NAME;
+        if(rowId != -1)
+        	countQuery += " WHERE rowId = " + rowId;
+        
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(countQuery, null);
+        int count = cursor.getCount();
+        cursor.close();
+        //jim
+        db.close();
+        // return count
+        return count;
+    }
+ 	
     
     public List<DbConstants> getAllTodoItems() {
         List<DbConstants> records = new ArrayList<DbConstants>();
