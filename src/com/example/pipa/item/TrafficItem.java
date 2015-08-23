@@ -34,8 +34,8 @@ public class TrafficItem extends ExpItemBase {
 		mService = service;
 
 		// one hour to record the network traffic
-		DEFAULT_ALARM_TIME = ONE_SECOND * 60 * 60;
-
+//		DEFAULT_ALARM_TIME = ONE_SECOND * 60 * 60;
+		DEFAULT_ALARM_TIME = ONE_SECOND * 6;
 	}
 
 	@Override
@@ -84,6 +84,9 @@ public class TrafficItem extends ExpItemBase {
 		
 		TrafficRecord diffRecord = latest.diffRecord(previous);
 		
+		if(diffRecord.tx == 0 && diffRecord.rx == 0)
+			return;
+		
 		if (SettingString.mIsDebug)
 			Log.d(mTag, "delta tx:" + diffRecord.tx + " delta rx:" + diffRecord.rx);
 
@@ -95,6 +98,7 @@ public class TrafficItem extends ExpItemBase {
 		TrafficPair.value = String.valueOf(diffRecord.tx);
 		pairList.add(TrafficPair);
 
+		TrafficPair = new RecordPair();
 		TrafficPair.key = ACCELEROMETER_RX;
 		TrafficPair.value = String.valueOf(diffRecord.rx);
 		pairList.add(TrafficPair);

@@ -7,10 +7,8 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.location.LocationManager;
 import android.os.Looper;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.example.plpa.utils.PreferenceHelper;
 import com.example.plpa.utils.SettingString;
