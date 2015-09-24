@@ -134,7 +134,7 @@ public class WifiItem extends ExpItemBase {
 	@Override
 	public boolean needTimeLimit() {
 		// TODO Auto-generated method stub
-		return true;
+		return false;
 	}
 
 }

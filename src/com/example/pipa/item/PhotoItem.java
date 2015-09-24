@@ -8,10 +8,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.IntentFilter.MalformedMimeTypeException;
-import android.os.Looper;
 import android.util.Log;
 
-import com.example.plpa.utils.PreferenceHelper;
 import com.example.plpa.utils.SettingString;
 
 public class PhotoItem extends ExpItemBase {

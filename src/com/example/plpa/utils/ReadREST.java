@@ -21,6 +21,7 @@ import android.util.Log;
 
 public class ReadREST extends AsyncTask<String, Void, String> {
 
+//	public static final String WEB_URI = "http://192.168.43.85";
 	public static final String WEB_URI = "http://140.119.163.68";
 	public static final String WEBSERVICE_ID_URI = WEB_URI + "/admin/DeviceInfoes/PostDeviceInfo";
 	public static final String PARAMETER_UUID = "UUID";
@@ -36,9 +37,12 @@ public class ReadREST extends AsyncTask<String, Void, String> {
 	public static final String JSON_EXPLIST_NAME = "Experiment";
 	public static final String JSON_EXP_ID = "Id";
 	public static final String JSON_EXP_TITLE = "Title";
-	public static final String JSON_EXP_MODIFYTIME = "ModifyTime";
-	public static final String JSON_EXP_ITEM = "Item";
-	public static final String JSON_EXP_POLICY = "Policy";
+	public static final String JSON_EXP_DESCRIPTION = "Description";
+	public static final String JSON_EXP_DETAIL = "Detail";
+	public static final String JSON_EXP_DATA = "Data";
+//	public static final String JSON_EXP_MODIFYTIME = "ModifyTime";
+	public static final String JSON_EXP_ITEMS = "Items";
+	public static final String JSON_EXP_POLICIES = "Policies";
 	
 	private String[] mReadURL;
 	

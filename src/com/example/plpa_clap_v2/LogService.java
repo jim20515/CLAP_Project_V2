@@ -10,6 +10,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.NetworkInfo;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -25,13 +28,13 @@ import com.example.pipa.item.GpsItem;
 import com.example.pipa.item.GsmItem;
 import com.example.pipa.item.LiItem;
 import com.example.pipa.item.MagnItem;
-import com.example.pipa.item.PhotoItem;
-import com.example.pipa.item.RingerItem;
 import com.example.pipa.item.OriItem;
+import com.example.pipa.item.PhotoItem;
 import com.example.pipa.item.PkgItem;
 import com.example.pipa.item.PowItem;
 import com.example.pipa.item.PresItem;
 import com.example.pipa.item.PxItem;
+import com.example.pipa.item.RingerItem;
 import com.example.pipa.item.ScreenItem;
 import com.example.pipa.item.SmsItem;
 import com.example.pipa.item.TempItem;
@@ -40,6 +43,9 @@ import com.example.pipa.item.WifiItem;
 import com.example.plpa.utils.DBHelper;
 import com.example.plpa.utils.DbConstants;
 import com.example.plpa.utils.ExpApplyJson;
+import com.example.plpa.utils.UploadPolicy;
+import com.example.plpa.utils.ExpApplyJson.Items;
+import com.example.plpa.utils.ExpApplyJson.Policy;
 import com.example.plpa.utils.ExpResultJson;
 import com.example.plpa.utils.PreferenceHelper;
 import com.example.plpa.utils.ReadREST;
@@ -52,21 +58,7 @@ public class LogService extends Service implements AsyncResponse{
 	private final String mTag = SettingString.TAG;
 	public static final boolean mIsDebug = SettingString.mIsDebug;
 
-//	private final String SCREENOFFUPLOAD = "screenoffupload";
-//	private final String CHARGINGUPLOAD = "chargingupload";
-//	private final String TIMELIMIT = "timelimit";
-//	private final String RECORDLIMIT = "recordlimit";
 	public static final String KEY_UPLOAD_DATE = "key_upload_date";
-	
-//	private static final String AMQPHOST = "140.119.221.34";
-//	private static final String AMQPVHOST = "clap";
-//	private static final String AMQPUSER = "clap";
-//	private static final String AMQPPASSWORD = "clap@nccu";
-//	private static final String QUEUE_NAME = "clap";
-
-//	private int mTimeLimit = 10000;// default
-//	private int mRecordLimit = 10000;// default
-	private List<ExpApplyJson.Policy> mPolicy;
 	
 	private ArrayList<ExpItemBase> mRealExpItems;
 	private ExpItemBase[] mAllExpItems;
@@ -145,25 +137,14 @@ public class LogService extends Service implements AsyncResponse{
 		Gson gson = new Gson();
 		ExpApplyJson applyJson = gson.fromJson(applyString, ExpApplyJson.class);
 		mDeviceId = PreferenceHelper.getInt(this, PreferenceHelper.CLIENT_DEVICE_ID);
-		mExpId = applyJson.ExpId;
-				
-		mRealExpItems = determineExpItem(applyJson.Items);
-		mPolicy = applyJson.Policies;
-//		
-//		determineUploadTime(applyJson.Policies);
+		mExpId = applyJson.Id;
+		
+		mRealExpItems = determineExpItem(applyJson.Detail.Items);
+		List<ExpApplyJson.Policy> policy = applyJson.Detail.Policy;
+		
+		determineUploadTime(policy);
 
 //		uploadExpRecord();
-		
-		IntentFilter filter = new IntentFilter();
-		filter.addAction(Intent.ACTION_BOOT_COMPLETED);
-		filter.addAction(Intent.ACTION_BATTERY_LOW);
-		filter.addAction(Intent.ACTION_BATTERY_OKAY);
-		filter.addAction(Intent.ACTION_POWER_CONNECTED);
-		
-		//for test
-//		filter.addAction(Intent.ACTION_USER_PRESENT);
-		
-		registerBroadcastReciever(filter);
 		
 		for (ExpItemBase item : mRealExpItems) {
 			registerBroadcastReciever(item.getIntentFilter());
@@ -171,6 +152,21 @@ public class LogService extends Service implements AsyncResponse{
 				stopSelf();
 		}
 
+	}
+
+	private void determineUploadTime(List<ExpApplyJson.Policy> policies) {
+		// TODO Auto-generated method stub
+
+		IntentFilter filter = new IntentFilter();
+		
+		for (Policy policy : policies) {
+			if(policy.Id == UploadPolicy.CONNECTPOWER)
+				filter.addAction(Intent.ACTION_POWER_CONNECTED);
+			else if(policy.Id == UploadPolicy.CONNECTWIFI)
+				filter.addAction(WifiManager.RSSI_CHANGED_ACTION);
+		}
+		
+		registerBroadcastReciever(filter);
 	}
 
 	private void registerBroadcastReciever(IntentFilter filter) {
@@ -194,12 +190,9 @@ public class LogService extends Service implements AsyncResponse{
 
 			boolean isReceived = false;
 
-			if (Intent.ACTION_SCREEN_OFF.equals(actionString) || 
-					Intent.ACTION_POWER_CONNECTED.equals(actionString)) {
-
+			if (Intent.ACTION_POWER_CONNECTED.equals(actionString)) {
 				uploadExpRecord();
 				isReceived = true;
-
 			}
 			
 			if (Intent.ACTION_BATTERY_LOW.equals(actionString)) {
@@ -210,6 +203,16 @@ public class LogService extends Service implements AsyncResponse{
 			if (Intent.ACTION_BATTERY_OKAY.equals(actionString) ||
 					Intent.ACTION_BOOT_COMPLETED.equals(actionString)) {
 				//start service
+				
+			}
+			
+			if (WifiManager.RSSI_CHANGED_ACTION.equals(actionString)) {
+				WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+			    WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+			    
+			    if (WifiInfo.getDetailedStateOf(wifiInfo.getSupplicantState()) == NetworkInfo.DetailedState.CONNECTED) {
+			    	uploadExpRecord();
+			    }
 				
 			}
 			
@@ -232,10 +235,10 @@ public class LogService extends Service implements AsyncResponse{
 	};
 	       
 	
-	private ArrayList<ExpItemBase> determineExpItem(ArrayList<ExpApplyJson.Item> itemJson) {
+	private ArrayList<ExpItemBase> determineExpItem(ArrayList<Items> items) {
 		ArrayList<ExpItemBase> realItems = new ArrayList<ExpItemBase>();
 
-		for (ExpApplyJson.Item jsonItem : itemJson) {
+		for (ExpApplyJson.Items jsonItem : items) {
 			for (ExpItemBase item : mAllExpItems) {
 				
 				if(jsonItem.ItemName.equals(item.mExpPrefix)) {
@@ -350,36 +353,6 @@ public class LogService extends Service implements AsyncResponse{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-//		ConnectionFactory factory = new ConnectionFactory();
-//		factory.setHost(AMQPHOST);
-//		factory.setVirtualHost(AMQPVHOST);
-//		factory.setUsername(AMQPUSER);
-//		factory.setPassword(AMQPPASSWORD);
-//		Connection connection = null;
-//		Channel channel = null;
-//
-//		try {
-//			connection = factory.newConnection();
-//			channel = connection.createChannel();
-//
-//			byte[] base64enc = Base64
-//					.encode(message.getBytes(), Base64.DEFAULT);
-//			channel.queueDeclare(QUEUE_NAME, false, false, false, null);
-//			channel.basicPublish("", QUEUE_NAME, null, base64enc);
-//
-//			channel.close();
-//			connection.close();
-//
-//			mDbHelper.deleteTable();
-////			CheckExperimentUpdate();
-//			
-//			PreferenceHelper.setPreference(this, PreferenceHelper.UPLOADED_TIME, 
-//					System.currentTimeMillis());
-//			
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
 
 	}
 

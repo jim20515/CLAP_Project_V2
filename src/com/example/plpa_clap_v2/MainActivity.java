@@ -14,9 +14,11 @@ import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.provider.Settings.Secure;
 import android.text.format.Time;
@@ -36,11 +38,6 @@ import com.google.gson.Gson;
 
 public class MainActivity extends Activity implements AsyncResponse {
 
-	class ExpDialogClass {
-		public String Id;
-		public String Name;
-	}
-	
 	private final boolean mIsDebug = SettingString.mIsDebug;
 	private Button mBtnLoadDSL;
 	private Button mBtnStart;
@@ -48,12 +45,12 @@ public class MainActivity extends Activity implements AsyncResponse {
 	// private TextView mDSLTxtView;
 	private Context mContext = this;
 
-	private ExpDialogClass mExpChoice;
+	private ExpApplyJson mExpChoice;
 
 	private int mClicentDeviceID;
 	private String mAuthCode;
-//	private String mDeviceOs;
-//	private String mDevice;
+	// private String mDeviceOs;
+	// private String mDevice;
 	private String mUUID;
 
 	@SuppressLint("SimpleDateFormat")
@@ -61,17 +58,50 @@ public class MainActivity extends Activity implements AsyncResponse {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		
+
 		// 取得使用者手機型號和OS版本
-//		mDeviceOs = android.os.Build.VERSION.RELEASE;
-//		mDevice = android.os.Build.MODEL.replace(' ', '-');
+		// mDeviceOs = android.os.Build.VERSION.RELEASE;
+		// mDevice = android.os.Build.MODEL.replace(' ', '-');
 		mUUID = Secure.getString(getContentResolver(), Secure.ANDROID_ID);
 
 		initView();
 		loadClientId();
 		// initExpItem();
 
+		IntentFilter filter = new IntentFilter();
+		filter.addAction(Intent.ACTION_BOOT_COMPLETED);
+		filter.addAction(Intent.ACTION_BATTERY_LOW);
+		filter.addAction(Intent.ACTION_BATTERY_OKAY);
+		
+		registerReceiver(mEventReceiver, filter);
 	}
+	
+	private BroadcastReceiver mEventReceiver = new BroadcastReceiver() {
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			// TODO Auto-generated method stub
+			String actionString = intent.getAction();
+
+			if (mIsDebug)
+				Log.d(SettingString.TAG, "Activity onReceive, Get Action:" + actionString);
+
+			boolean isReceived = false;
+			
+			if (Intent.ACTION_BATTERY_LOW.equals(actionString)) {
+				StopService();
+			}
+
+			if (Intent.ACTION_BATTERY_OKAY.equals(actionString) ||
+					Intent.ACTION_BOOT_COMPLETED.equals(actionString)) {
+				startRecording();
+			}
+			
+			if (!isReceived)
+				Log.d(SettingString.TAG, "No one received this broadcast:" + actionString);
+		}
+		
+	};
 
 	private void initView() {
 		mBtnLoadDSL = (Button) findViewById(R.id.button_load);
@@ -180,7 +210,7 @@ public class MainActivity extends Activity implements AsyncResponse {
 	}
 
 	// 將實驗列表以選單方式提供受測者選取
-	private void ShowExpList(final ExpDialogClass[] expList) {
+	private void ShowExpList(final ExpApplyJson[] expList) {
 		AlertDialog.Builder builder = new Builder(this);
 
 		builder.setTitle("Choose an experiment");
@@ -191,30 +221,43 @@ public class MainActivity extends Activity implements AsyncResponse {
 		} else {
 			expNames = new String[expList.length];
 			for (int i = 0; i < expList.length; i++) {
-				expNames[i] = expList[i].Name;
+				expNames[i] = expList[i].Title;
 			}
 
 		}
 
 		builder.setItems(expNames, new DialogInterface.OnClickListener() {
+
 			public void onClick(DialogInterface dialog, int which) {
 
 				mExpChoice = expList[which];
 
-				HashMap<String, String> params = new HashMap<String, String>();
-				params.put(ReadREST.PARAMETER_EXPID, mExpChoice.Id);
+				CommonAlertDialog.showAlertDialog(mContext, mExpChoice.Title,
+						mExpChoice.Description, true,
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog,
+									int whichButton) // 確認後開始感測
+							{
+								Gson gson = new Gson();
+								String choiceJson = gson.toJson(mExpChoice, ExpApplyJson.class);
+								
+								PreferenceHelper.setPreference(mContext,
+										PreferenceHelper.PREF_EXPAPPLY,choiceJson);
+								
+								Time time = new Time();
+								time.setToNow();
 
-				try {
-					ReadREST readREST = new ReadREST();
-					readREST.execute(ReadREST.WEBSERVICE_EXPDETAIL_URL,
-							ReadREST.getPostDataString(params));
+								PreferenceHelper.setPreference(mContext,
+										PreferenceHelper.UPLOADED_TIME,
+										time.toMillis(false));
 
-					readREST.mAsyncDelegate = MainActivity.this;
-				} catch (UnsupportedEncodingException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+								startRecording();
+								dialog.dismiss();
+
+							}
+						});
 			}
+
 		});
 
 		builder.setNegativeButton(R.string.str_no,
@@ -286,8 +329,7 @@ public class MainActivity extends Activity implements AsyncResponse {
 				if (ReadREST.WEBSERVICE_ID_URI.equals(url)) {
 					mClicentDeviceID = urlResult
 							.getInt(PreferenceHelper.CLIENT_DEVICE_ID);
-					
-					
+
 					mAuthCode = urlResult.getString(PreferenceHelper.AUTH_CODE);
 					// ClicentDeviceID = "262";
 					// AuthCode = "52bceea3e55a6e2fdee85b30efc8fa71";
@@ -307,53 +349,34 @@ public class MainActivity extends Activity implements AsyncResponse {
 
 					int count = experiments.length();
 
-					ExpDialogClass[] expList = new ExpDialogClass[count];
+					ExpApplyJson[] expList = new ExpApplyJson[count];
 
 					for (int i = 0; i < experiments.length(); i++) {
 						JSONObject experiment = experiments.getJSONObject(i);
-						ExpDialogClass expInfo = new ExpDialogClass();
+						// ExpApplyJson expInfo = new ExpApplyJson();
 
-						expInfo.Id = experiment
-								.getString(ReadREST.JSON_EXP_ID);
-						expInfo.Name = experiment
-								.getString(ReadREST.JSON_EXP_TITLE);
+						// expInfo.Id = experiment.getInt(ReadREST.JSON_EXP_ID);
+						// expInfo.Title = experiment
+						// .getString(ReadREST.JSON_EXP_TITLE);
+						// expInfo.Description = experiment
+						// .getString(ReadREST.JSON_EXP_DESCRIPTION);
+						//
+						// JSONObject detail =
+						// experiment.getJSONObject(ReadREST.JSON_EXP_DETAIL);
+						// JSONObject data =
+						// detail.getJSONObject(ReadREST.JSON_EXP_DATA);
+						//
+						// JSONArray items =
+						// data.getJSONArray(ReadREST.JSON_EXP_ITEMS);
+						Gson gson = new Gson();
+						ExpApplyJson applyJson = gson.fromJson(
+								experiment.toString(), ExpApplyJson.class);
 
-						expList[i] = expInfo;
+						expList[i] = applyJson;
 					}
 
 					ShowExpList(expList);
-					
-				} else if (ReadREST.WEBSERVICE_EXPDETAIL_URL.equals(url)) {
-					
-					Gson gson = new Gson();
-					ExpApplyJson expApply = gson.fromJson(result, ExpApplyJson.class);
 
-					String strDialogTitle = getString(R.string.str_alert_title);
-
-					final String finalResult = result;
-					
-					CommonAlertDialog.showAlertDialog(mContext, strDialogTitle,
-							expApply.Description, true,
-							new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog,
-										int whichButton) // 確認後開始感測
-								{
-									PreferenceHelper.setPreference(mContext,
-											PreferenceHelper.PREF_EXPAPPLY, finalResult);
-									
-									Time time = new Time();
-									time.setToNow();
-
-									PreferenceHelper.setPreference(mContext,
-											PreferenceHelper.UPLOADED_TIME,
-											time.toMillis(false));
-
-									startRecording();
-									dialog.dismiss();
-
-								}
-
-							});
 				}
 			}
 
