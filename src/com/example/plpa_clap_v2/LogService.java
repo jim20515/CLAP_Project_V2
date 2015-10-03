@@ -195,17 +195,6 @@ public class LogService extends Service implements AsyncResponse{
 				isReceived = true;
 			}
 			
-			if (Intent.ACTION_BATTERY_LOW.equals(actionString)) {
-				//stop service
-				
-			}
-
-			if (Intent.ACTION_BATTERY_OKAY.equals(actionString) ||
-					Intent.ACTION_BOOT_COMPLETED.equals(actionString)) {
-				//start service
-				
-			}
-			
 			if (WifiManager.RSSI_CHANGED_ACTION.equals(actionString)) {
 				WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
 			    WifiInfo wifiInfo = wifiManager.getConnectionInfo();
@@ -318,11 +307,6 @@ public class LogService extends Service implements AsyncResponse{
 //	}
 
 	public void uploadExpRecord() {
-		
-//		if(!Connectivity.isConnected(this)) {
-//			CommonAlertDialog.showOKAlertDialog(this, "�ж}��Wifi�H�Ѹ�ƤW��");
-//			return;
-//		}
 		
 		for (ExpItemBase item : mRealExpItems) {
 			item.doSomethingBeforeUpload(this);
