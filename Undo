@@ -1,5 +1,1 @@
-第一次ID會找不到
-load experiemnt list應該連description一起撈
-service會死掉
-
-
+1.AppItem要使用Alarm Manager（三秒是否有需要後台選擇）

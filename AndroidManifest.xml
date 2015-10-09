@@ -33,7 +33,7 @@
 	
     <uses-sdk
         android:minSdkVersion="14"
-        android:targetSdkVersion="18" />
+        android:targetSdkVersion="22" />
 
     <application
         android:allowBackup="true"
@@ -52,15 +52,21 @@
 
         <service android:name=".LogService" />
 
-        <!--
-        <receiver android:name=".LogService$EventReceiver">
+        
+        <!-- <receiver android:name=".LogService$EventReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BATTERY_LOW" />
                 <action android:name="android.intent.action.BATTERY_OKAY" />
                 <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
             </intent-filter>
+        </receiver> -->
+        <receiver android:name=".SystemReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BATTERY_LOW" />
+                <action android:name="android.intent.action.BATTERY_OKAY" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
         </receiver>
-        -->
     </application>
 
 </manifest>

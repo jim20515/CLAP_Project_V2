@@ -14,11 +14,9 @@ import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.provider.Settings.Secure;
 import android.text.format.Time;
@@ -68,40 +66,40 @@ public class MainActivity extends Activity implements AsyncResponse {
 		loadClientId();
 		// initExpItem();
 
-		IntentFilter filter = new IntentFilter();
-		filter.addAction(Intent.ACTION_BOOT_COMPLETED);
-		filter.addAction(Intent.ACTION_BATTERY_LOW);
-		filter.addAction(Intent.ACTION_BATTERY_OKAY);
-		
-		registerReceiver(mEventReceiver, filter);
+//		IntentFilter filter = new IntentFilter();
+//		filter.addAction(Intent.ACTION_BOOT_COMPLETED);
+//		filter.addAction(Intent.ACTION_BATTERY_LOW);
+//		filter.addAction(Intent.ACTION_BATTERY_OKAY);
+//		
+//		registerReceiver(mEventReceiver, filter);
 	}
 	
-	private BroadcastReceiver mEventReceiver = new BroadcastReceiver() {
-
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			// TODO Auto-generated method stub
-			String actionString = intent.getAction();
-
-			if (mIsDebug)
-				Log.d(SettingString.TAG, "Activity onReceive, Get Action:" + actionString);
-
-			boolean isReceived = false;
-			
-			if (Intent.ACTION_BATTERY_LOW.equals(actionString)) {
-				StopService();
-			}
-
-			if (Intent.ACTION_BATTERY_OKAY.equals(actionString) ||
-					Intent.ACTION_BOOT_COMPLETED.equals(actionString)) {
-				startRecording();
-			}
-			
-			if (!isReceived)
-				Log.d(SettingString.TAG, "No one received this broadcast:" + actionString);
-		}
-		
-	};
+//	private BroadcastReceiver mEventReceiver = new BroadcastReceiver() {
+//
+//		@Override
+//		public void onReceive(Context context, Intent intent) {
+//			// TODO Auto-generated method stub
+//			String actionString = intent.getAction();
+//
+//			if (mIsDebug)
+//				Log.d(SettingString.TAG, "Activity onReceive, Get Action:" + actionString);
+//
+//			boolean isReceived = false;
+//			
+//			if (Intent.ACTION_BATTERY_LOW.equals(actionString)) {
+//				StopService();
+//			}
+//
+//			if (Intent.ACTION_BATTERY_OKAY.equals(actionString) ||
+//					Intent.ACTION_BOOT_COMPLETED.equals(actionString)) {
+//				startRecording();
+//			}
+//			
+//			if (!isReceived)
+//				Log.d(SettingString.TAG, "No one received this broadcast:" + actionString);
+//		}
+//		
+//	};
 
 	private void initView() {
 		mBtnLoadDSL = (Button) findViewById(R.id.button_load);
