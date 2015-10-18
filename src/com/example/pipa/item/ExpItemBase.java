@@ -30,7 +30,7 @@ public abstract class ExpItemBase {
     public AlarmManager am;
     
     public static long ONE_SECOND = 1000;
-    public static long DEFAULT_ALARM_TIME = ONE_SECOND * 20;
+    public long DEFAULT_ALARM_TIME = ONE_SECOND * 20;
     
 //	public boolean needTimeLimit;
 	
@@ -100,10 +100,6 @@ public abstract class ExpItemBase {
 		insertRecord(context, attr, value, null);
 	}
 	
-//	private void insertRecord(Context context, String attr, double value, String dateTime) {
-//		insertRecord(context, attr, String.valueOf(value), dateTime);
-//	}
-	
 	@SuppressLint("SimpleDateFormat")
 	public void insertRecord(Context context, List<RecordPair> pairs) {
 
@@ -115,18 +111,6 @@ public abstract class ExpItemBase {
 		}
 		
 	}
-	
-//	@SuppressLint("SimpleDateFormat")
-//	public void insertOrUpdateRecord(Context context, List<RecordPair> pairs) {
-//
-//		SimpleDateFormat s = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
-//		String format = s.format(new Date());
-//		
-//		for(RecordPair pair : pairs){
-//			insertRecord(context, pair.key, pair.value, format, false);
-//		}
-//		
-//	}
 	
 	public void insertRecordWithTime(Context context, List<RecordPairWithTime> pairs) {
 		
@@ -156,39 +140,4 @@ public abstract class ExpItemBase {
 //			mHelper.AddOrUpdateRecord(dbItem);
 	}
 	
-//	private List<DbConstants> countConstantsBetween(DbConstants preConstants, 
-//			DbConstants afterConstants, int interval) {
-//		List<DbConstants> constants = new ArrayList<DbConstants>();
-//		
-//		SimpleDateFormat iso8601Format = new SimpleDateFormat(
-//	            "yyyy-MM-dd HH:mm:ss");
-//		
-//		Date preDateTime = null;
-//		Date afterDateTime = null;
-//		
-//	    if (preConstants.getDateTime() != null && afterConstants.getDateTime() != null) {
-//	        try {
-//	        	preDateTime = iso8601Format.parse(preConstants.getDateTime());
-//	        	afterDateTime = iso8601Format.parse(afterConstants.getDateTime());
-//	        	
-//	        } catch (ParseException e) {
-//	        	preDateTime = null;
-//	        	afterDateTime = null;
-//	        	
-//	        } catch (java.text.ParseException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//	    }
-//	    
-//	    if(preDateTime != null && afterDateTime != null) {
-//	    	int diff = preDateTime.compareTo(afterDateTime);
-//	    	
-//	    	if(diff > interval) {
-//	    		
-//	    	}
-//	    }
-//	    
-//		return constants;
-//	}
 }

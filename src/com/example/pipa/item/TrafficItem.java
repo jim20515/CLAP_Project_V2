@@ -35,7 +35,7 @@ public class TrafficItem extends ExpItemBase {
 
 		// one hour to record the network traffic
 //		DEFAULT_ALARM_TIME = ONE_SECOND * 60 * 60;
-		DEFAULT_ALARM_TIME = ONE_SECOND * 6;
+//		DEFAULT_ALARM_TIME = ONE_SECOND * 6;
 	}
 
 	@Override

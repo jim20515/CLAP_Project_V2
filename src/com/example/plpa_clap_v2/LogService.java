@@ -10,8 +10,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.net.NetworkInfo;
-import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.IBinder;
 import android.util.Log;
@@ -43,7 +41,7 @@ import com.example.pipa.item.WifiItem;
 import com.example.plpa.utils.DBHelper;
 import com.example.plpa.utils.DbConstants;
 import com.example.plpa.utils.ExpApplyJson;
-import com.example.plpa.utils.UploadPolicy;
+import com.example.plpa.utils.ExpApplyJson.ItemInterval;
 import com.example.plpa.utils.ExpApplyJson.Items;
 import com.example.plpa.utils.ExpApplyJson.Policy;
 import com.example.plpa.utils.ExpResultJson;
@@ -51,6 +49,7 @@ import com.example.plpa.utils.PreferenceHelper;
 import com.example.plpa.utils.ReadREST;
 import com.example.plpa.utils.ReadREST.AsyncResponse;
 import com.example.plpa.utils.SettingString;
+import com.example.plpa.utils.UploadPolicy;
 import com.google.gson.Gson;
 
 public class LogService extends Service implements AsyncResponse{
@@ -139,9 +138,8 @@ public class LogService extends Service implements AsyncResponse{
 		mDeviceId = PreferenceHelper.getInt(this, PreferenceHelper.CLIENT_DEVICE_ID);
 		mExpId = applyJson.Id;
 		
-		mRealExpItems = determineExpItem(applyJson.Detail.Items);
+		mRealExpItems = determineExpItem(applyJson.Detail.Items, applyJson.Detail.ItemIntervals);
 		List<ExpApplyJson.Policy> policy = applyJson.Detail.Policy;
-		
 		determineUploadTime(policy);
 
 //		uploadExpRecord();
@@ -163,16 +161,13 @@ public class LogService extends Service implements AsyncResponse{
 			if(policy.Id == UploadPolicy.CONNECTPOWER)
 				filter.addAction(Intent.ACTION_POWER_CONNECTED);
 			else if(policy.Id == UploadPolicy.CONNECTWIFI)
-				filter.addAction(WifiManager.RSSI_CHANGED_ACTION);
+				filter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
 		}
 		
 		registerBroadcastReciever(filter);
 	}
 
 	private void registerBroadcastReciever(IntentFilter filter) {
-//		if (mEventReceiver == null)
-//			mEventReceiver = new EventReceiver();
-
 		if (filter != null)
 			registerReceiver(mEventReceiver, filter);
 		
@@ -190,20 +185,29 @@ public class LogService extends Service implements AsyncResponse{
 
 			boolean isReceived = false;
 
+
+			int wifiState = intent.getIntExtra(WifiManager.EXTRA_WIFI_STATE, -1);
 			if (Intent.ACTION_POWER_CONNECTED.equals(actionString)) {
 				uploadExpRecord();
 				isReceived = true;
-			}
-			
-			if (WifiManager.RSSI_CHANGED_ACTION.equals(actionString)) {
-				WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-			    WifiInfo wifiInfo = wifiManager.getConnectionInfo();
-			    
-			    if (WifiInfo.getDetailedStateOf(wifiInfo.getSupplicantState()) == NetworkInfo.DetailedState.CONNECTED) {
-			    	uploadExpRecord();
-			    }
-				
-			}
+			}else if (WifiManager.WIFI_STATE_CHANGED_ACTION.equals(intent.getAction())
+	                && WifiManager.WIFI_STATE_ENABLED == wifiState) {
+	        	uploadExpRecord();
+				isReceived = true;
+	        }
+	        
+//			if (WifiManager.RSSI_CHANGED_ACTION.equals(actionString)) {
+//				WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+//			    WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+//			    Log.d(mTag, "1");
+//			    
+//			    if (WifiInfo.getDetailedStateOf(wifiInfo.getSupplicantState()) == NetworkInfo.DetailedState.CONNECTED) {
+//			    	uploadExpRecord();
+//			    	Log.d(mTag, "2");
+//			    	isReceived = true;
+//			    }
+//				
+//			}
 			
 			for (ExpItemBase item : mRealExpItems) {
 				if (item.receiveBroadcast(context, intent)) {
@@ -224,15 +228,25 @@ public class LogService extends Service implements AsyncResponse{
 	};
 	       
 	
-	private ArrayList<ExpItemBase> determineExpItem(ArrayList<Items> items) {
+	private ArrayList<ExpItemBase> determineExpItem(ArrayList<Items> items, 
+			ArrayList<ItemInterval> intervals) {
 		ArrayList<ExpItemBase> realItems = new ArrayList<ExpItemBase>();
 
 		for (ExpApplyJson.Items jsonItem : items) {
+			
 			for (ExpItemBase item : mAllExpItems) {
 				
 				if(jsonItem.ItemName.equals(item.mExpPrefix)) {
 					
 					if (!realItems.contains(item)) {
+						
+						for (ExpApplyJson.ItemInterval interval : intervals){
+							if(jsonItem.ItemId == interval.ItemId && interval.Interval != 0) {
+								
+								item.DEFAULT_ALARM_TIME = interval.Interval * 1000;
+							}
+						}
+						
 						realItems.add(item);
 						
 						Log.d(mTag, "Add exp item:" + item.mExpPrefix);

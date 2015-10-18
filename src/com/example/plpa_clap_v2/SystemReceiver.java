@@ -27,9 +27,7 @@ public class SystemReceiver extends BroadcastReceiver{
 			context.stopService(serviceIntent);
 			
 			isReceived = true;
-		}
-
-		if (Intent.ACTION_BATTERY_OKAY.equals(actionString) ||
+		}else if (Intent.ACTION_BATTERY_OKAY.equals(actionString) ||
 				Intent.ACTION_BOOT_COMPLETED.equals(actionString)) {
 			Intent serviceIntent = new Intent(context, LogService.class);
 			context.startService(serviceIntent);

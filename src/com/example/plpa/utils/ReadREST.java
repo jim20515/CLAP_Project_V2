@@ -27,7 +27,7 @@ public class ReadREST extends AsyncTask<String, Void, String> {
 	public static final String PARAMETER_UUID = "UUID";
 	
 	public static final String WEBSERVICE_EXPLIST_URL = WEB_URI + "/admin/ExperimentApply/GetExperimentList";
-	public static final String WEBSERVICE_EXPDETAIL_URL = WEB_URI + "/admin/ExperimentApply/GetExperimentDetail";
+//	public static final String WEBSERVICE_EXPDETAIL_URL = WEB_URI + "/admin/ExperimentApply/GetExperimentDetail";
 	
 	public static final String WEBSERVICE_EXPPOST_URL = WEB_URI + "/admin/Record/Post";
 	public static final String PARAMETER_EXPPOST_VALUE = "value";

@@ -60,12 +60,6 @@ public class WifiItem extends ExpItemBase {
 		// TODO Auto-generated method stub
 		IntentFilter filter = new IntentFilter();
 
-//		if (mExpRealAttributes.contains(PREF_SSID)) {
-//			filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
-//			filter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
-//		}
-		
-//		if (mExpRealAttributes.contains(PREF_RSSI))
 			filter.addAction(WifiManager.RSSI_CHANGED_ACTION);
 
 		return filter;
@@ -97,6 +91,8 @@ public class WifiItem extends ExpItemBase {
 
 //		} else if (WifiManager.RSSI_CHANGED_ACTION.equals(action)) {
 
+		//後來測試此Broadcast會發出四次的警告
+		//所以這個看之後要不要改成service裡面的那個wifi開關
 		if (WifiManager.RSSI_CHANGED_ACTION.equals(action)) {
 			
 			String ssid = "none";

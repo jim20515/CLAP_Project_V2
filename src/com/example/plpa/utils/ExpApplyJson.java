@@ -11,6 +11,7 @@ public class ExpApplyJson {
 	public class Detail{
 		public ArrayList<Items> Items;
 		public ArrayList<Policy> Policy;
+		public ArrayList<ItemInterval> ItemIntervals;
 	}
 	
 	public class Items{
@@ -18,7 +19,6 @@ public class ExpApplyJson {
 		public String ItemName;
 		public int AttrId;
 		public String AttrName;
-//		public double Condition;
 	}
 	
 	public class Policy {
@@ -27,5 +27,8 @@ public class ExpApplyJson {
 		public String Name;
 	}
 	
-	
+	public class ItemInterval {
+		public int ItemId;
+		public int Interval;
+	}
 }
