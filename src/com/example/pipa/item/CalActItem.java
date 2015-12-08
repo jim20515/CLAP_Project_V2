@@ -47,9 +47,6 @@ public class CalActItem extends ExpItemBase {
 		// TODO Auto-generated method stub
 		super.doSomethingBeforeUpload(context);
 		
-//		if(mExpRealAttributes.size() == 0)
-//			return;
-		
 		long uploadTime = PreferenceHelper.getLong(context, PreferenceHelper.UPLOADED_TIME);
 		
 		ContentResolver resolver = context.getContentResolver();
@@ -61,9 +58,6 @@ public class CalActItem extends ExpItemBase {
 
 		SimpleDateFormat formatter = new SimpleDateFormat(
 				"yyyy-MM-dd HH:mm:ss");
-		
-		int callTime = 0;
-		int receiveTime = 0;
 		
 		for (int i = 0; i < cursor.getCount(); i++) {
 			cursor.moveToPosition(i);
@@ -85,26 +79,20 @@ public class CalActItem extends ExpItemBase {
 				Log.d("Jim", "Name:" + name + "Incoming:" + number + ", Time:"
 						+ time);
 				
-//				if(mExpRealAttributes.contains(PREF_RECEIVE_NUMBER))
-					insertRecord(context, RECEIVE_NUMBER, 
+				insertRecord(context, RECEIVE_NUMBER, 
 						cursor.getString(cursor.getColumnIndex(CallLog.Calls.NUMBER)), time);
 				
-				receiveTime += duration;
-//				if(mExpRealAttributes.contains(PREF_RECEIVE_TIME))
-					insertRecord(context, RECEIVE_TIME, String.valueOf(receiveTime), time);
+				insertRecord(context, RECEIVE_TIME, String.valueOf(duration), time);
 				
 			//out call
 			} else if (cursor.getInt(cursor.getColumnIndex(CallLog.Calls.TYPE)) == 2) {
 				Log.d("Jim", "Name:" + name + "Outcoming:" + number + ", Time:"
 						+ time);
 
-//				if(mExpRealAttributes.contains(PREF_CALL_NUMBER))
-					insertRecord(context, CALL_NUMBER, 
+				insertRecord(context, CALL_NUMBER, 
 						cursor.getString(cursor.getColumnIndex(CallLog.Calls.NUMBER)), time);
 				
-				callTime += duration;
-//				if(mExpRealAttributes.contains(PREF_CALL_TIME))
-					insertRecord(context, CALL_TIME, String.valueOf(callTime), time);
+				insertRecord(context, CALL_TIME, String.valueOf(duration), time);
 			}
 		}
 	}

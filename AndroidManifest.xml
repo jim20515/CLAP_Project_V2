@@ -37,8 +37,8 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/ic_launcher"
-        android:label="@string/app_name"
+        android:icon="@drawable/nccucs"
+        android:label="Test"
         android:theme="@style/AppTheme" >
         <activity
             android:name="com.example.plpa_clap_v2.MainActivity"
