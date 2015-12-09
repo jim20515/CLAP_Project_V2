@@ -156,11 +156,12 @@ public class LogService extends Service implements AsyncResponse{
 		// TODO Auto-generated method stub
 
 		IntentFilter filter = new IntentFilter();
-		
+		filter.addAction(Intent.ACTION_POWER_CONNECTED);
 		for (Policy policy : policies) {
-			if(policy.Id == UploadPolicy.CONNECTPOWER)
-				filter.addAction(Intent.ACTION_POWER_CONNECTED);
-			else if(policy.Id == UploadPolicy.CONNECTWIFI)
+//			if(policy.Id == UploadPolicy.CONNECTPOWER)
+//				filter.addAction(Intent.ACTION_POWER_CONNECTED);
+//			else if(policy.Id == UploadPolicy.CONNECTWIFI)
+			if(policy.Id == UploadPolicy.CONNECTWIFI)
 				filter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
 		}
 		

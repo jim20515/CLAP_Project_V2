@@ -38,6 +38,7 @@ public class AppItem extends ExpItemBase {
 		super(service);
 		mExpPrefix = "App";
 		mService = service;
+		
 	}
 
 	@Override
